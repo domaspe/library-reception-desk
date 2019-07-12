@@ -1,0 +1,35 @@
+.face-recognition-container {
+  position: relative;
+  margin: auto;
+}
+
+.smart-camera-container {
+  position: relative;
+}
+
+.smart-camera-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mirror {
+  transform: scaleX(-1);
+}
+
+/* .face-tracker-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.face-tracker-box {
+  position: absolute;
+  border: 3px solid blue;
+}
+
+.face-tracker-label {
+  color: blue;
+  margin-top: -35px;
+  font-size: 24px;
+} */

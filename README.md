@@ -1,3 +1,4 @@
 # library-reception-desk
 
-App for tradcking items taken from item library
+To start the prod version use `npm run start`
+To start the dev version use 'npm run client`
