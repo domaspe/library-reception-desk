@@ -88,7 +88,7 @@ function drawDetection(canvasEl, videoEl, result) {
 
     // faceapi.draw.drawFaceLandmarks(canvasEl, resizedDetections);
     // eslint-disable-next-line no-empty
-  } catch {}
+  } catch (err) {}
 }
 
 function findMatchingFace(descriptor) {
@@ -145,7 +145,9 @@ export async function scan() {
     debug.match = '';
     if (match) {
       const matchStats = getTimeStats('faceMatch', Date.now() - matchStart);
-      debug.match = `${matchStats.time}ms ${matchStats.fps}fps ${match.toString()}`;
+      debug.match = `${matchStats.time}ms ${
+        matchStats.fps
+      }fps ${match.toString()}`;
     }
     drawDetection(canvas, video, detection);
   }

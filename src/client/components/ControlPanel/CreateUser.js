@@ -36,14 +36,24 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CreateUser = ({ isSavingFace, faceSaveProgress, saveFace, saveFaceless, setView }) => {
+const CreateUser = ({
+  isSavingFace,
+  faceSaveProgress,
+  saveFace,
+  saveFaceless,
+  setView
+}) => {
   const classes = useStyles();
   const [nameError, setNameError] = React.useState(false);
   const [name, setName] = React.useState('');
   const [withFace, setWithFace] = React.useState(true);
 
-  const handleNameChange = React.useCallback(event => setName(event.target.value));
-  const handleFaceChange = React.useCallback(event => setWithFace(event.target.checked));
+  const handleNameChange = React.useCallback(event =>
+    setName(event.target.value)
+  );
+  const handleFaceChange = React.useCallback(event =>
+    setWithFace(event.target.checked)
+  );
 
   const handleSubmit = React.useCallback(
     event => {
@@ -79,11 +89,22 @@ const CreateUser = ({ isSavingFace, faceSaveProgress, saveFace, saveFaceless, se
   }
 
   return (
-    <form className={classes.container} noValidate autoComplete="off" onSubmit={handleSubmit}>
+    <form
+      className={classes.container}
+      noValidate
+      autoComplete="off"
+      onSubmit={handleSubmit}
+    >
       <Typography variant="h5" color="textSecondary">
         Create New User
       </Typography>
-      <Grid container spacing={2} justify="center" alignContent="center" alignItems="center">
+      <Grid
+        container
+        spacing={2}
+        justify="center"
+        alignContent="center"
+        alignItems="center"
+      >
         <Grid item xs={6}>
           <TextField
             label="Name"
