@@ -104,7 +104,10 @@ function* failAssignItemWithTimeout() {
 }
 
 function* assignCodeToUser(code, user) {
-  const assignResponse = yield call(fetch, '/api/items', 'POST', { id: code, user });
+  const assignResponse = yield call(fetch, '/api/items', 'POST', {
+    id: code,
+    user
+  });
   const item = yield select(selectItemLabelByCode, code);
 
   if (!assignResponse.status || assignResponse.status === 'STATUS_FAIL') {
@@ -154,7 +157,9 @@ function* tryAssignItem({ code }) {
   }
   yield put(actions.assignItemStarted());
 
-  const clearResponse = yield call(fetch, '/api/items', 'DELETE', { id: codeInt });
+  const clearResponse = yield call(fetch, '/api/items', 'DELETE', {
+    id: codeInt
+  });
   if (clearResponse.status === 'STATUS_SUCCESS') {
     const item = yield select(selectItemLabelByCode, codeInt);
     yield put(actions.notify(`${item} was returned`));
@@ -222,7 +227,9 @@ function* scanFaceLoop() {
     }
 
     yield delay(
-      isFaceDetectionNotified && !isSavingFace ? FACE_QUICK_SCAN_INTERVAL : FACE_SCAN_INTERVAL
+      isFaceDetectionNotified && !isSavingFace
+        ? FACE_QUICK_SCAN_INTERVAL
+        : FACE_SCAN_INTERVAL
     );
   }
 }
@@ -253,7 +260,9 @@ function* scanQrLoop() {
     const isSavingFace = yield select(selectIsSavingFace);
     const isFaceDetectionNotified = yield select(selectIsFaceDetected);
     yield delay(
-      isFaceDetectionNotified && !isSavingFace ? QR_QUICK_SCAN_INTERVAL : QR_SCAN_INTERVAL
+      isFaceDetectionNotified && !isSavingFace
+        ? QR_QUICK_SCAN_INTERVAL
+        : QR_SCAN_INTERVAL
     );
   }
 }

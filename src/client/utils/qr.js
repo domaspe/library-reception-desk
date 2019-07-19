@@ -56,11 +56,19 @@ function drawScaledRect(
 }
 
 function matchDimensions(virtualCanvas, outputCanvas, inputVideo) {
-  const mediaDims = videoUtils.matchDimensions(virtualCanvas, inputVideo, false);
+  const mediaDims = videoUtils.matchDimensions(
+    virtualCanvas,
+    inputVideo,
+    false
+  );
   const mediaWidth = mediaDims.width;
   const mediaHeight = mediaDims.height;
 
-  const outputDims = videoUtils.matchDimensions(outputCanvas, inputVideo, false);
+  const outputDims = videoUtils.matchDimensions(
+    outputCanvas,
+    inputVideo,
+    false
+  );
   const outputWidth = outputDims.width;
   const outputHeight = outputDims.height;
 
@@ -98,7 +106,12 @@ export function scan() {
   }
 
   virtualCtx.drawImage(video, 0, 0, dims.mediaWidth, dims.mediaHeight);
-  const imageData = virtualCtx.getImageData(0, 0, dims.mediaWidth, dims.mediaHeight);
+  const imageData = virtualCtx.getImageData(
+    0,
+    0,
+    dims.mediaWidth,
+    dims.mediaHeight
+  );
 
   const code = jsQR(imageData.data, imageData.width, imageData.height, {
     inversionAttempts: 'dontInvert'
@@ -110,6 +123,7 @@ export function scan() {
   }
 
   const matchStats = getTimeStats('qrScan', Date.now() - scanStart);
+  console.log('end');
   return {
     data: code ? code.data : null,
     debug: `${matchStats.time}ms ${matchStats.fps}fps`
