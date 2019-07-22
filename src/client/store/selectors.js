@@ -13,11 +13,17 @@ const selectItemsState = state => state.items;
 const selectUsersState = state => state.users;
 
 export function selectIsFaceHistoryReady(state) {
-  return selectFaceHistoryState(state).descriptors.length >= DESCRIPTORS_PER_CLASS;
+  return (
+    selectFaceHistoryState(state).descriptors.length >= DESCRIPTORS_PER_CLASS
+  );
 }
 
 export function selectIsSavingFace(state) {
   return selectFaceHistoryState(state).status === SAVE_FACE_START;
+}
+
+export function selectIsNotSavingFace(state) {
+  return selectFaceHistoryState(state).status !== SAVE_FACE_START;
 }
 
 export function selectIsUpdatingClass(state) {
@@ -26,7 +32,9 @@ export function selectIsUpdatingClass(state) {
 
 export function selectFaceDataCollectedPercentage(state) {
   return selectIsSavingFace(state)
-    ? (selectFaceHistoryState(state).descriptors.length / DESCRIPTORS_PER_CLASS) * 100
+    ? (selectFaceHistoryState(state).descriptors.length /
+        DESCRIPTORS_PER_CLASS) *
+        100
     : 0;
 }
 

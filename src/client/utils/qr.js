@@ -94,6 +94,35 @@ export function setMedia(videoEl, canvasEl) {
   video = videoEl;
 }
 
+export function getWorkerData() {
+  if (video.paused || video.ended) {
+    return null;
+  }
+
+  if (!dims) {
+    dims = matchDimensions(virtualCanvas, canvas, video);
+    return null;
+  }
+
+  virtualCtx.drawImage(video, 0, 0, dims.mediaWidth, dims.mediaHeight);
+  const imageData = virtualCtx.getImageData(
+    0,
+    0,
+    dims.mediaWidth,
+    dims.mediaHeight
+  );
+
+  const { data, width, height } = imageData;
+  return { data, width, height };
+}
+
+export function drawCode(code) {
+  canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+  if (code) {
+    drawScaledRect(canvasCtx, code.location, dims.ratio);
+  }
+}
+
 export function scan() {
   const scanStart = Date.now();
   if (video.paused || video.ended) {
