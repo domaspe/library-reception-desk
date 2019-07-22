@@ -7,10 +7,7 @@ import {
   select,
   race,
   delay,
-  take,
-  fork,
-  cancel,
-  throttle
+  take
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import * as actions from './actions';
@@ -34,12 +31,8 @@ import * as face from '../utils/face';
 import * as qr from '../utils/qr';
 import {
   MAIN_VIEW,
-  FACE_SCAN_INTERVAL as FACE_SLOW_SCAN_INTERVAL,
-  QR_SCAN_INTERVAL as QR_SLOW_SCAN_INTERVAL,
-  TIMEOUT_AFTER_ASSIGN,
-  FACE_QUICK_SCAN_INTERVAL,
-  QR_QUICK_SCAN_INTERVAL,
-  QR_DETECTED_DELAY
+  FACE_SLOW_SCAN_INTERVAL,
+  TIMEOUT_AFTER_ASSIGN
 } from '../constants';
 import { mapFloat32ArrayToArr } from '../utils/float32Array';
 import { mapResponseToClass } from '../utils/classUtils';
@@ -47,7 +40,6 @@ import QrWorker from '../utils/qr.worker';
 
 /* eslint-disable no-underscore-dangle */
 const __faceDebugEl__ = document.getElementById('faceDebug');
-const __qrDebugEl__ = document.getElementById('qrDebug');
 /* eslint-enable */
 
 const animationFrame = () =>
@@ -245,39 +237,6 @@ function* scanFaceLoop() {
   }
 }
 
-// function* scanQrLoop() {
-//   let callNextFail = false;
-//   while (true) {
-//     yield call(waitIfUserPickerOpen);
-
-//     const result = yield call(qr.scan);
-
-//     if (__qrDebugEl__ && result) {
-//       // prettier-ignore
-//       __qrDebugEl__.innerHTML = `qr: ${result.debug}`;
-//     }
-
-//     if (result && result.data) {
-//       const prevCode = yield select(selectQrCode);
-//       if (result.data !== prevCode) {
-//         callNextFail = true;
-//         yield put(actions.qrDetectSuccess(result.data));
-//       }
-//     } else if (callNextFail) {
-//       callNextFail = false;
-//       yield put(actions.qrDetectFail());
-//     }
-
-//     const isSavingFace = yield select(selectIsSavingFace);
-//     const isFaceDetectionNotified = yield select(selectIsFaceDetected);
-//     yield delay(
-//       isFaceDetectionNotified && !isSavingFace
-//         ? QR_QUICK_SCAN_INTERVAL
-//         : QR_SLOW_SCAN_INTERVAL
-//     );
-//   }
-// }
-
 function* scanQrWorkerLoop() {
   let callNextFail = false;
   const qrWorker = new QrWorker();
@@ -302,8 +261,7 @@ function* scanQrWorkerLoop() {
         if (code.data !== prevCode) {
           callNextFail = true;
           yield put(actions.qrDetectSuccess(code.data));
-          qr.drawCode();
-          yield delay(QR_DETECTED_DELAY);
+          yield delay(TIMEOUT_AFTER_ASSIGN);
         }
       } else if (callNextFail) {
         callNextFail = false;

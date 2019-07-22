@@ -6,7 +6,9 @@ const items = require('../../data/defaultItems.json');
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
 const STATUS_FAIL = 'STATUS_FAIL';
 
-const adapter = new FileSync(path.join(__dirname, '../../data', 'database.json'));
+const adapter = new FileSync(
+  path.join(__dirname, '../../data', 'database.json')
+);
 const db = low(adapter);
 
 db.defaults({ users: [], items, descriptors: [] }).write();
@@ -72,7 +74,7 @@ function clearUserFromItem(id) {
 function setUserInItem(id, user) {
   const itemExists = exists('items', { id });
   if (!itemExists) {
-    return null;
+    return STATUS_FAIL;
   }
 
   // assign
