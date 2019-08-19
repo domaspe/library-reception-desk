@@ -1,16 +1,31 @@
-import { SAVE_FACE_START, UPDATE_CLASS, FACE_DETECT_SUCCESS } from './actions';
-import { DESCRIPTORS_PER_CLASS } from '../constants';
+import { matchPath } from 'react-router-dom';
+import {
+  SAVE_FACE_START,
+  UPDATE_CLASS,
+  FACE_DETECT_SUCCESS,
+  LOAD_USERS
+} from './actions';
+import {
+  DESCRIPTORS_PER_CLASS,
+  PATH_SLEEP,
+  PATH_FACE_SCAN,
+  PATH_SESSION,
+  PATH_NOT_RECOGNIZED,
+  PATH_CREATE_USER,
+  PATH_HELP
+} from '../constants';
 import { itemToString } from '../utils/item';
 
 const selectFaceState = state => state.face;
 const selectFaceMatchState = state => state.faceMatch;
 const selectFaceHistoryState = state => state.faceHistory;
 const selectQrState = state => state.qr;
-const selectViewState = state => state.view;
 const selectNotifyState = state => state.notify;
 const selectScanState = state => state.scan;
 const selectItemsState = state => state.items;
 const selectUsersState = state => state.users;
+const selectActiveUserState = state => state.activeUser;
+const selectRouterState = state => state.router;
 
 export function selectIsFaceHistoryReady(state) {
   return (
@@ -19,15 +34,18 @@ export function selectIsFaceHistoryReady(state) {
 }
 
 export function selectIsSavingFace(state) {
-  return selectFaceHistoryState(state).status === SAVE_FACE_START;
-}
-
-export function selectIsNotSavingFace(state) {
-  return selectFaceHistoryState(state).status !== SAVE_FACE_START;
+  return (
+    selectFaceHistoryState(state).status === SAVE_FACE_START ||
+    selectFaceHistoryState(state).status === UPDATE_CLASS
+  );
 }
 
 export function selectIsUpdatingClass(state) {
   return selectFaceHistoryState(state).status === UPDATE_CLASS;
+}
+
+export function selectIsLoadingUsers(state) {
+  return selectUsersState(state).status === LOAD_USERS;
 }
 
 export function selectFaceDataCollectedPercentage(state) {
@@ -54,12 +72,12 @@ export function selectFaceMatchLabel(state) {
   return selectFaceMatchState(state).label;
 }
 
-export function selectQrCode(state) {
-  return selectQrState(state).code;
+export function selectAllFaceMatchAttemptsFailed(state) {
+  return selectFaceMatchState(state).consecutiveFails > 15;
 }
 
-export function selectCurrentView(state) {
-  return selectViewState(state).view;
+export function selectQrCode(state) {
+  return selectQrState(state).code;
 }
 
 export function selectNotificationMessage(state) {
@@ -90,14 +108,6 @@ export function selectUsers(state) {
   return selectUsersState(state).users;
 }
 
-export function selectUserPickerCode(state) {
-  return selectViewState(state).userPickerCode;
-}
-
-export function selectIsUserPickerOpen(state) {
-  return !!selectUserPickerCode(state);
-}
-
 export function selectItemLabelByCode(state, code) {
   const item = selectItemByCode(state, code);
   if (!item) {
@@ -107,7 +117,40 @@ export function selectItemLabelByCode(state, code) {
   return itemToString(item);
 }
 
-export function selectUserPickerTitle(state) {
-  const code = selectUserPickerCode(state);
-  return selectItemLabelByCode(state, code);
+export function selectUserItems(state, user) {
+  return selectItems(state).filter(item => String(item.user) === String(user));
+}
+
+function selectPathname(state) {
+  const { pathname } = selectRouterState(state).location;
+  return pathname;
+}
+
+export function selectIsHibernatedPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_SLEEP });
+}
+
+export function selectIsFaceScanPage(state) {
+  const pathname = selectPathname(state);
+  return !!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/';
+}
+
+export function selectIsSessionPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_SESSION });
+}
+
+export function selectIsNotRecognizedPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_NOT_RECOGNIZED });
+}
+
+export function selectIsCreateUserPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_CREATE_USER });
+}
+
+export function selectIsHelpPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_HELP });
+}
+
+export function selectActiveUserId(state) {
+  return selectActiveUserState(state).id;
 }

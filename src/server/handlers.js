@@ -6,9 +6,9 @@ const items = require('../../data/defaultItems.json');
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
 const STATUS_FAIL = 'STATUS_FAIL';
 
-const adapter = new FileSync(
-  path.join(__dirname, '../../data', 'database.json')
-);
+const dataPath = path.join(__dirname, '../../data');
+
+const adapter = new FileSync(path.join(dataPath, 'database.json'));
 const db = low(adapter);
 
 db.defaults({ users: [], items, descriptors: [] }).write();
@@ -20,6 +20,10 @@ const exists = (table, filter) =>
     .size()
     .value() > 0;
 
+function reloadDatabase() {
+  db.read();
+}
+
 function updateOrAddUser(id) {
   if (!exists('users', { id })) {
     db.get('users')
@@ -28,10 +32,10 @@ function updateOrAddUser(id) {
   }
 }
 
-function updateUserInItem(id, user) {
+function updateAssignment(itemId, user) {
   db.get('items')
-    .find({ id })
-    .assign({ user })
+    .find({ id: itemId })
+    .assign({ user, dateTaken: user ? Date.now() : null })
     .write();
 }
 
@@ -50,29 +54,37 @@ function getDescriptors() {
   return db.get('descriptors').value();
 }
 
-function clearUserFromItem(id) {
-  const itemExists = exists('items', { id });
+function getItem(itemId) {
+  const itemExists = exists('items', { id: itemId });
 
   if (!itemExists) {
     return null;
   }
 
-  const item = db
+  return db
     .get('items')
-    .find({ id })
+    .find({ id: itemId })
     .value();
+}
+
+function unassignUser(itemId) {
+  const item = getItem(itemId);
+
+  if (!item) {
+    return null;
+  }
 
   if (item.user) {
-    updateUserInItem(id, null);
+    updateAssignment(itemId, null);
     console.log('success');
     return STATUS_SUCCESS;
   }
 
-  return null;
+  return STATUS_FAIL;
 }
 
-function setUserInItem(id, user) {
-  const itemExists = exists('items', { id });
+function assignUser(itemId, user) {
+  const itemExists = exists('items', { id: itemId });
   if (!itemExists) {
     return STATUS_FAIL;
   }
@@ -80,7 +92,7 @@ function setUserInItem(id, user) {
   // assign
   const userExists = exists('users', { id: user });
   if (userExists) {
-    updateUserInItem(id, user);
+    updateAssignment(itemId, user);
     return STATUS_SUCCESS;
   }
 
@@ -96,12 +108,13 @@ function getUsers() {
 }
 
 module.exports = {
-  updateOrAddDescriptors,
+  reloadDatabase,
   getDescriptors,
   getItems,
+  updateOrAddDescriptors,
+  assignUser,
   updateOrAddUser,
-  setUserInItem,
-  clearUserFromItem,
+  unassignUser,
   getUsers,
   STATUS_SUCCESS,
   STATUS_FAIL

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions';
 
-const DetectionCamera = ({ width: preferredWidth, scanStart }) => {
+const HiddenCamera = ({ width: preferredWidth, scanStart }) => {
   const videoRef = React.useRef();
   const faceCanvasRef = React.useRef();
   const qrCanvasRef = React.useRef();
@@ -60,4 +60,4 @@ const mapDispatchToProps = {
 export default connect(
   null,
   mapDispatchToProps
-)(DetectionCamera);
+)(HiddenCamera);

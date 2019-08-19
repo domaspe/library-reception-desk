@@ -1,6 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Table, TableHead, TableRow, TableCell, TableBody } from '@material-ui/core';
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody
+} from '@material-ui/core';
 import { selectItems } from '../store/selectors';
 import { itemToString } from '../utils/item';
 

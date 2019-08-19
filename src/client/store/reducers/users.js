@@ -2,6 +2,7 @@ import { LOAD_USERS, LOAD_USERS_SUCCESS } from '../actions';
 
 const initialState = {
   users: [],
+  activeUser: '',
   status: null
 };
 

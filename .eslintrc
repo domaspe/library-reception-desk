@@ -21,6 +21,12 @@
     "import/prefer-default-export": 0,
     "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
     "react/prop-types": 0,
-    "react/jsx-wrap-multilines": 0
+    "react/jsx-wrap-multilines": 0,
+    "react/forbid-prop-types": 0,
+    "react/require-default-props": 0,
+    "jsx-a11y/anchor-is-valid": 0,
+    "jsx-a11y/accessible-emoji": 0,
+    "jsx-a11y/alt-text": 0,
+    "react/no-unescaped-entities": 0
   }
 }

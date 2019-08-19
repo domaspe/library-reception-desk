@@ -26,11 +26,24 @@ export const LOAD_ITEMS_SUCCESS = 'LOAD_ITEMS_SUCCESS';
 export const LOAD_USERS = 'LOAD_USERS';
 export const LOAD_USERS_SUCCESS = 'LOAD_USERS_SUCCESS';
 
+export const SET_ACTIVE_USER = 'SET_ACTIVE_USER';
+export const CLEAR_ACTIVE_USER = 'CLEAR_ACTIVE_USER';
+
 export const NOTIFY = 'NOTIFY';
 
-export const SCAN_START = 'SCAN_START';
+export const INITIALIZE_SCANNERS = 'INITIALIZE_SCANNERS';
 
 export const PICK_USER = 'PICK_USER';
+
+export const TRY_ASSIGN_ITEM = 'TRY_ASSIGN_ITEM';
+
+export const START_SESSION = 'START_SESSION';
+export const END_SESSION = 'END_SESSION';
+export const START_SCANNING_FACES = 'START_SCANNING_FACES';
+export const FACE_NOT_RECOGNIZED = 'FACE_NOT_RECOGNIZED';
+export const HIBERNATE = 'HIBERNATE';
+export const CREATE_USER = 'CREATE_USER';
+export const HELP = 'HELP';
 
 export function appInit() {
   return {
@@ -51,7 +64,7 @@ export function faceDetectFail() {
   };
 }
 
-export function saveFace(label) {
+export function saveFaceStart(label) {
   return {
     type: SAVE_FACE_START,
     label
@@ -143,14 +156,12 @@ export function notify(message) {
   };
 }
 
-export function scanStart({ videoRef, faceCanvasRef, qrCanvasRef, mediaWidth, mediaHeight }) {
+export function scanStart({ videoRef, faceCanvasRef, qrCanvasRef }) {
   return {
-    type: SCAN_START,
+    type: INITIALIZE_SCANNERS,
     videoRef,
     faceCanvasRef,
-    qrCanvasRef,
-    mediaWidth,
-    mediaHeight
+    qrCanvasRef
   };
 }
 
@@ -196,5 +207,70 @@ export function openUserPicker(code) {
 export function closeUserPicker() {
   return {
     type: CLOSE_USER_PICKER
+  };
+}
+
+export function tryAssignItem(itemId, userId = null) {
+  return {
+    type: TRY_ASSIGN_ITEM,
+    itemId,
+    userId
+  };
+}
+
+export function setActiveUser(id) {
+  return {
+    type: SET_ACTIVE_USER,
+    id
+  };
+}
+
+export function clearActiveUser() {
+  return {
+    type: CLEAR_ACTIVE_USER
+  };
+}
+
+export function endSession() {
+  return {
+    type: END_SESSION
+  };
+}
+
+export function startSession(userId) {
+  return {
+    type: START_SESSION,
+    userId
+  };
+}
+
+export function hibernate(userId) {
+  return {
+    type: HIBERNATE,
+    userId
+  };
+}
+
+export function startScanningFaces() {
+  return {
+    type: START_SCANNING_FACES
+  };
+}
+
+export function faceNotRecognized() {
+  return {
+    type: FACE_NOT_RECOGNIZED
+  };
+}
+
+export function createUser() {
+  return {
+    type: CREATE_USER
+  };
+}
+
+export function help() {
+  return {
+    type: HELP
   };
 }

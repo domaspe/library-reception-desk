@@ -1,10 +1,11 @@
 import { select, take } from 'redux-saga/effects';
 
-export function* waitFor(selector) {
-  if (yield select(selector)) return; // (1)
+export function* waitFor(selector, expectedResult = true) {
+  if (yield select(selector) === expectedResult) return expectedResult; // (1)
 
   while (true) {
     yield take('*'); // (1a)
-    if (yield select(selector)) return; // (1b)
+    const result = yield select(selector);
+    if (result === expectedResult) return result; // (1b)
   }
 }

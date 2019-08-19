@@ -13,7 +13,7 @@ const faceDetectionNet = faceapi.nets.tinyFaceDetector;
 const minConfidence = 0.5;
 
 // tiny_face_detector options
-const inputSize = 224; // divisible by 32
+const inputSize = 512; // divisible by 32
 const scoreThreshold = 0.5;
 
 // mtcnn options
@@ -125,7 +125,7 @@ export async function createFaceMatcher(classes) {
 }
 
 export async function scan() {
-  if (video.paused || video.ended || !video.width || !video.height) {
+  if (video.paused || video.ended) {
     return null;
   }
 

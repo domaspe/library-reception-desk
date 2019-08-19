@@ -1,13 +1,14 @@
 import createSagaMiddleware from 'redux-saga';
 import { createStore, applyMiddleware, compose } from 'redux';
 import reducers from './reducers';
-import sagas from './sagas';
+import sagas from './sagas/index';
 
 const sagaMiddleware = createSagaMiddleware();
 
 // dev tools middleware
 /* eslint-disable no-underscore-dangle */
-const reduxDevTools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
+const reduxDevTools =
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
 /* eslint-enable */
 
 const store = createStore(

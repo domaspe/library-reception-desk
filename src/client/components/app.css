@@ -1,0 +1,48 @@
+.smart-camera-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  /* top: -9999px;
+  left: -9999px; */
+  /* opacity: 0.5; */
+  transform-origin: bottom center;
+  transform: scale(-0.2, 0.2);
+}
+
+.smart-camera-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mirror {
+  transform: scaleX(-1);
+}
+
+.main-container {
+  height: 100vh;
+}
+
+.switch-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.switch-wrapper > div {
+  position: absolute;
+}
+
+.item {
+  opacity: 1;
+}
+
+.item-exit {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 100ms ease-out;
+}

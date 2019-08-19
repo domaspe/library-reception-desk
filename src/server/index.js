@@ -11,15 +11,22 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '20mb' }));
+app.use(nocache());
 
 const rootDir = path.join(__dirname, '../..');
 
 app.use(express.static('dist'));
 app.use('/weights', express.static(path.join(rootDir, 'weights')));
+app.use('/assets', express.static(path.join(rootDir, 'assets')));
 
-app.use(nocache());
+app.get('/api/getUsername', (req, res) =>
+  res.send({ username: os.userInfo().username })
+);
 
-app.get('/api/getUsername', (req, res) => res.send({ username: os.userInfo().username }));
+app.get('/api/reload', (req, res) => {
+  handlers.reloadDatabase();
+  return res.sendStatus(200);
+});
 
 app.get('/api/users', (req, res) => {
   const users = handlers.getUsers();
@@ -49,18 +56,12 @@ app.post('/api/users', (req, res) => {
   res.sendStatus(200);
 });
 
-app.post('/api/items', (req, res) => {
-  const { user, id } = req.body;
-  const status = handlers.setUserInItem(id, user);
-  res.status(200).json({
-    status
-  });
-});
+app.post('/api/items/:id', (req, res) => {
+  const { user } = req.body;
+  const status = user
+    ? handlers.assignUser(Number(req.params.id), user)
+    : handlers.unassignUser(Number(req.params.id));
 
-app.delete('/api/items', (req, res) => {
-  const { id } = req.body;
-  console.log('/api/items', id);
-  const status = handlers.clearUserFromItem(id);
   res.status(200).json({
     status
   });
