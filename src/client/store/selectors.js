@@ -97,7 +97,9 @@ export function selectShouldPauseScan(state) {
 }
 
 export function selectItems(state) {
-  return selectItemsState(state).items;
+  return selectItemsState(state).items.sort(
+    (a, b) => new Date(b.dateTaken) - new Date(a.dateTaken)
+  );
 }
 
 export function selectItemByCode(state, code) {

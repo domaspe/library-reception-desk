@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   IconButton,
@@ -6,11 +6,8 @@ import {
   Button,
   Typography,
   Paper,
-  GridList,
-  GridListTile,
   Box
 } from '@material-ui/core';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import {
   Clear as ClearIcon,
   ExitToApp as ExitToAppIcon
@@ -18,12 +15,11 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import moment from 'moment';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import classNames from 'classnames';
 import { selectUserItems, selectActiveUserId } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
-import { usePrevious } from '../../utils/hooks';
 
 const useStyles = makeStyles(theme => ({
   name: {
@@ -39,7 +35,8 @@ const useStyles = makeStyles(theme => ({
   },
   list: {
     maxHeight: '50vh',
-    width: '100%'
+    width: '100%',
+    overflow: 'scroll'
   },
   item: {
     padding: theme.spacing(2),
@@ -65,7 +62,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SessionPage = ({ userId, items, tryAssignItem, onLogout, width }) => {
+const SessionPage = ({ userId, items, tryAssignItem, onLogout }) => {
   const classes = useStyles();
 
   return (
@@ -92,7 +89,7 @@ const SessionPage = ({ userId, items, tryAssignItem, onLogout, width }) => {
         </>
       }
       actions={
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={onLogout}>
           End session
         </Button>
       }
@@ -105,7 +102,7 @@ const SessionPage = ({ userId, items, tryAssignItem, onLogout, width }) => {
         <Box className={classes.list}>
           <TransitionGroup>
             {items.map(item => (
-              <CSSTransition key={item.id} timeout={500} classNames="item">
+              <CSSTransition key={item.id} timeout={100} classNames="item">
                 <Box>
                   <Paper className={classes.item}>
                     <Grid container>
@@ -175,4 +172,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withWidth()(SessionPage));
+)(SessionPage);

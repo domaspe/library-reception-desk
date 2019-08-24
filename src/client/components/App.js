@@ -34,6 +34,7 @@ import {
 } from '../constants';
 import CreateUserPage from './pages/CreateUserPage';
 import { theme } from '../utils/theme';
+import Test from './common/Test';
 
 function mapStyles(styles) {
   return {
@@ -56,6 +57,8 @@ const App = ({ appInit }) => {
 
   return (
     <React.Fragment>
+      {/* TODO: temp */}
+      <Test />
       <CssBaseline />
       {/* TODO: temp */}
       {/* <HiddenCamera /> */}
