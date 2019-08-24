@@ -1,13 +1,28 @@
 import React, { useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { CircularProgress, TextField, Button } from '@material-ui/core';
+import {
+  CircularProgress,
+  TextField,
+  Button,
+  makeStyles,
+  FormControlLabel,
+  Checkbox
+} from '@material-ui/core';
 import * as selectors from '../../store/selectors';
 import * as actions from '../../store/actions';
+import Layout from '../common/Layout';
+
+const useStyles = makeStyles(theme => ({
+  ok: {
+    // margin: theme.spacing(3, 0, 0, 0)
+  }
+}));
 
 const FaceScanPage = ({ progress, saveFaceStart, onCancel, isSendingData }) => {
   const [view, setView] = useState('name');
   const [name, setName] = useState('');
+  const classes = useStyles();
 
   const handleNameChange = useCallback(event => {
     setName(event.target.value);
@@ -19,7 +34,14 @@ const FaceScanPage = ({ progress, saveFaceStart, onCancel, isSendingData }) => {
   }, [name]);
 
   return view === 'name' ? (
-    <div>
+    <Layout
+      iconSrc="/assets/facial-recognition.svg"
+      actions={
+        <Button color="primary" onClick={onCancel}>
+          Cancel
+        </Button>
+      }
+    >
       <form noValidate autoComplete="off" onSubmit={handleNameSubmit}>
         <TextField
           label="Name"
@@ -27,15 +49,24 @@ const FaceScanPage = ({ progress, saveFaceStart, onCancel, isSendingData }) => {
           onChange={handleNameChange}
           margin="normal"
           variant="outlined"
+          fullWidth
+          required
         />
-        <Button variant="contained" color="primary" type="submit">
-          Ok
-        </Button>
-        <Button variant="contained" color="secondary" onClick={onCancel}>
-          Cancel
+        <FormControlLabel
+          control={<Checkbox value="remember" color="primary" />}
+          label="Save face"
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          fullWidth
+          className={classes.ok}
+        >
+          Next
         </Button>
       </form>
-    </div>
+    </Layout>
   ) : (
     <div>
       Capturing your face
