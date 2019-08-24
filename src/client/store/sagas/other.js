@@ -20,6 +20,7 @@ import fetch from '../../utils/fetch';
 import { mapFloat32ArrayToArr } from '../../utils/float32Array';
 
 function* appInit() {
+  yield call(fetch, '/api/reload', 'GET');
   yield all([put(actions.loadItems()), put(actions.loadUsers())]);
 }
 

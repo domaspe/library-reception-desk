@@ -103,42 +103,46 @@ const SessionPage = ({ userId, items, tryAssignItem, onLogout, width }) => {
       </Typography>
       <Box className={classes.gridListContainer}>
         <Box className={classes.list}>
-          <TransitionGroup component={null}>
+          <TransitionGroup>
             {items.map(item => (
               <CSSTransition key={item.id} timeout={500} classNames="item">
-                <Paper className={classes.item}>
-                  <Grid container>
-                    <Grid item xs={2}>
-                      <Box
-                        className={classes.thumbnail}
-                        style={{
-                          backgroundImage: `url("/data/thumbnails/${item.thumbnail}")`
-                        }}
-                      />
+                <Box>
+                  <Paper className={classes.item}>
+                    <Grid container>
+                      <Grid item xs={2}>
+                        <Box
+                          className={classes.thumbnail}
+                          style={{
+                            backgroundImage: `url("/data/thumbnails/${item.thumbnail}")`
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={10}>
+                        <Box className={classes.description}>
+                          <Typography className={classes.caption1} noWrap>
+                            {item.caption1}
+                          </Typography>
+                          <Typography className={classes.caption2} noWrap>
+                            {item.caption2}
+                          </Typography>
+                          <Typography variant="caption">
+                            Taken&nbsp;
+                            {moment(item.dateTaken).format(
+                              'MMM Do YYYY, hh:mm'
+                            )}
+                          </Typography>
+                        </Box>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={10}>
-                      <Box className={classes.description}>
-                        <Typography className={classes.caption1} noWrap>
-                          {item.caption1}
-                        </Typography>
-                        <Typography className={classes.caption2} noWrap>
-                          {item.caption2}
-                        </Typography>
-                        <Typography variant="caption">
-                          Taken&nbsp;
-                          {moment(item.dateTaken).format('MMM Do YYYY, hh:mm')}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  <IconButton
-                    color="primary"
-                    onClick={() => tryAssignItem(item.id)}
-                    className={classes.close}
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </Paper>
+                    <IconButton
+                      color="primary"
+                      onClick={() => tryAssignItem(item.id)}
+                      className={classes.close}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </Paper>
+                </Box>
               </CSSTransition>
             ))}
           </TransitionGroup>
