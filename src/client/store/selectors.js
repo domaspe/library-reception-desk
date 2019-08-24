@@ -3,7 +3,9 @@ import {
   SAVE_FACE_START,
   UPDATE_CLASS,
   FACE_DETECT_SUCCESS,
-  LOAD_USERS
+  LOAD_USERS,
+  QR_DETECT_SUCCESS,
+  ASSIGN_ITEM_SUCCESS
 } from './actions';
 import {
   DESCRIPTORS_PER_CLASS,
@@ -117,6 +119,14 @@ export function selectItemLabelByCode(state, code) {
   }
 
   return itemToString(item);
+}
+
+export function selectNotifyAssignItemAuccess(state) {
+  const itemsState = selectItemsState(state);
+  return (
+    itemsState.status === ASSIGN_ITEM_SUCCESS &&
+    Date.now() - itemsState.timestamp < 1000
+  );
 }
 
 export function selectUserItems(state, user) {

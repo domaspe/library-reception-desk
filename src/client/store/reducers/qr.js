@@ -1,7 +1,8 @@
 import { QR_DETECT_FAIL, QR_DETECT_SUCCESS } from '../actions';
 
 const initialState = {
-  code: ''
+  code: '',
+  status: null
 };
 
 export default function qr(state = initialState, action) {
@@ -9,7 +10,8 @@ export default function qr(state = initialState, action) {
     case QR_DETECT_SUCCESS:
       return {
         ...state,
-        code: action.code
+        code: action.code,
+        status: QR_DETECT_SUCCESS
       };
     case QR_DETECT_FAIL:
       return {

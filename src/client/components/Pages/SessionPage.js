@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   IconButton,
@@ -8,18 +8,20 @@ import {
   Paper,
   Box
 } from '@material-ui/core';
-import {
-  Clear as ClearIcon,
-  ExitToApp as ExitToAppIcon
-} from '@material-ui/icons';
+import { Clear as ClearIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import moment from 'moment';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { selectUserItems, selectActiveUserId } from '../../store/selectors';
+import {
+  selectUserItems,
+  selectActiveUserId,
+  selectNotifyAssignItemAuccess
+} from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
+import { useIconAnimation } from '../../utils/hooks';
 
 const useStyles = makeStyles(theme => ({
   name: {
@@ -62,12 +64,21 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SessionPage = ({ userId, items, tryAssignItem, onLogout }) => {
+const SessionPage = ({
+  userId,
+  items,
+  tryAssignItem,
+  onLogout,
+  assignItemSuccess
+}) => {
   const classes = useStyles();
+  const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
 
   return (
     <Layout
       iconSrc="/assets/qr.svg"
+      animateIcon={animateIcon}
+      onIconAnimationEnd={onIconAnimationEnd}
       titleComponent={
         <>
           <Typography
@@ -160,7 +171,8 @@ const mapStateToProps = state => {
   const userId = selectActiveUserId(state);
   return {
     userId,
-    items: selectUserItems(state, userId)
+    items: selectUserItems(state, userId),
+    assignItemSuccess: selectNotifyAssignItemAuccess(state)
   };
 };
 

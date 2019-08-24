@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
+import classNames from 'classnames';
 
 const XS = 7;
 
@@ -20,7 +21,14 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const Layout = ({ iconSrc, children, actions, titleComponent }) => {
+const Layout = ({
+  iconSrc,
+  children,
+  actions,
+  titleComponent,
+  animateIcon,
+  onIconAnimationEnd
+}) => {
   const classes = useStyles();
 
   return (
@@ -36,7 +44,10 @@ const Layout = ({ iconSrc, children, actions, titleComponent }) => {
         >
           <Grid item xs={12}>
             <div
-              className={classes.icon}
+              className={classNames(classes.icon, 'animated', {
+                bounce: animateIcon
+              })}
+              onAnimationEnd={onIconAnimationEnd}
               style={{ backgroundImage: `url("${iconSrc}")` }}
             />
           </Grid>
