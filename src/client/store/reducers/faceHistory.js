@@ -8,7 +8,6 @@ import {
 
 const initialState = {
   status: '',
-  label: '',
   descriptors: []
 };
 
@@ -32,14 +31,12 @@ export default function face(state = initialState, action) {
       return {
         ...state,
         status: action.type,
-        label: '',
         descriptors: []
       };
     case SAVE_FACE_START:
       return {
         ...state,
         status: SAVE_FACE_START,
-        label: action.label,
         descriptors: []
       };
     default:

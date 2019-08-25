@@ -1,29 +1,20 @@
 import React from 'react';
-import { IconButton, Typography } from '@material-ui/core';
-import { HelpOutline as HelpOutlineIcon } from '@material-ui/icons';
+import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
 import { selectNotifyAssignItemAuccess } from '../../store/selectors';
 import { useIconAnimation } from '../../utils/hooks';
+import HelpButton from '../common/HelpButton';
 
-const FaceScanPage = ({ help, assignItemSuccess }) => {
+const FaceScanPage = ({ assignItemSuccess }) => {
   const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
   return (
     <Layout
       iconSrc="/assets/faceid-happy.svg"
       animateIcon={animateIcon}
       onIconAnimationEnd={onIconAnimationEnd}
-      actions={
-        <IconButton
-          aria-label="remove item"
-          onClick={() => help()}
-          color="primary"
-        >
-          <HelpOutlineIcon />
-        </IconButton>
-      }
+      actions={<HelpButton />}
       titleComponent={
         <Typography variant="h6" color="textPrimary" align="center">
           Look straight into the camera to get started.
@@ -34,18 +25,11 @@ const FaceScanPage = ({ help, assignItemSuccess }) => {
 };
 
 FaceScanPage.propTypes = {
-  help: PropTypes.func.isRequired
+  assignItemSuccess: PropTypes.bool.isRequired
 };
 
 const mapSateToProps = state => ({
   assignItemSuccess: selectNotifyAssignItemAuccess(state)
 });
 
-const mapDispatchToProps = {
-  help: actions.help
-};
-
-export default connect(
-  mapSateToProps,
-  mapDispatchToProps
-)(FaceScanPage);
+export default connect(mapSateToProps)(FaceScanPage);

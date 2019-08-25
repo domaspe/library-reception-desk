@@ -93,7 +93,7 @@ export function setMedia(videoEl, canvasEl) {
 }
 
 export function getWorkerData() {
-  if (video.paused || video.ended) {
+  if (!video || video.paused || video.ended) {
     return null;
   }
 

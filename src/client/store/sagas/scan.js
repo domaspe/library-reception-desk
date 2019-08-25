@@ -134,16 +134,6 @@ function* scanQrWorker() {
       }
     }
 
-    // const isSavingFace = yield select(selectIsSavingFace);
-    // const isFaceDetected = yield select(selectIsFaceDetected);
-    // if (isSavingFace) {
-    //   yield call(waitFor, selectIsSavingFace, false);
-    // } else if (isFaceDetected) {
-    //   yield call(animationFrame);
-    // } else {
-    //   yield call(waitFor, selectIsFaceDetected);
-    // }
-
     if (yield select(selectIsSessionPage)) {
       yield call(animationFrame);
     } else {
@@ -205,8 +195,5 @@ function* startScan(action) {
 }
 
 export default function* sagas() {
-  yield all([
-    yield takeLatest(actions.UPDATE_CLASS_SUCCESS, startScan),
-    yield takeLatest(actions.INITIALIZE_SCANNERS, startScan)
-  ]);
+  yield all([yield takeLatest(actions.INITIALIZE_SCANNERS, startScan)]);
 }

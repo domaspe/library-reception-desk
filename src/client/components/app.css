@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .smart-camera-container {
   position: absolute;
   bottom: 0;

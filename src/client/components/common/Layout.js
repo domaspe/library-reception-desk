@@ -1,23 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid } from '@material-ui/core';
 import classNames from 'classnames';
 
-const XS = 7;
-
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   icon: {
     height: 100,
     width: 100,
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
-    margin: '0 auto'
+    margin: '0 auto',
+    marginBottom: theme.spacing(2)
   },
   iconSmall: {
     height: 40,
     width: 40
+  },
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    width: '90vw',
+    minWidth: 400,
+    maxWidth: 900,
+    margin: '0 auto',
+    padding: theme.spacing(4)
+  },
+  box: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: theme.spacing(2),
+    width: '100%'
+  },
+  children: {
+    minHeight: '30vh',
+    flexDirection: 'column'
+  },
+  logButton: {
+    position: 'absolute'
   }
 }));
 
@@ -32,43 +55,22 @@ const Layout = ({
   const classes = useStyles();
 
   return (
-    <Grid container spacing={2} justify="center" alignItems="center">
+    <div className={classes.container}>
       {iconSrc && (
-        <Grid
-          item
-          xs={XS}
-          justify="center"
-          alignItems="center"
-          container
-          spacing={2}
-        >
-          <Grid item xs={12}>
-            <div
-              className={classNames(classes.icon, 'animated', {
-                bounce: animateIcon
-              })}
-              onAnimationEnd={onIconAnimationEnd}
-              style={{ backgroundImage: `url("${iconSrc}")` }}
-            />
-          </Grid>
-        </Grid>
+        <div
+          className={classNames(classes.icon, 'animated', {
+            bounce: animateIcon
+          })}
+          onAnimationEnd={onIconAnimationEnd}
+          style={{ backgroundImage: `url("${iconSrc}")` }}
+        />
       )}
-      {titleComponent && (
-        <Grid item xs={XS} container justify="center" alignItems="center">
-          {titleComponent}
-        </Grid>
-      )}
+      {titleComponent && <div className={classes.box}>{titleComponent}</div>}
       {children && (
-        <Grid item xs={XS} container justify="center" alignItems="center">
-          {children}
-        </Grid>
+        <div className={`${classes.box} ${classes.children}`}>{children}</div>
       )}
-      {actions && (
-        <Grid item xs={XS} container justify="center" alignItems="center">
-          {actions}
-        </Grid>
-      )}
-    </Grid>
+      {actions && <div className={classes.box}>{actions}</div>}
+    </div>
   );
 };
 

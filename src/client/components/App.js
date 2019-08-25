@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import { MemoryRouter, Router, Route, InitialRoute } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { AnimatedSwitch, spring } from 'react-router-transition';
+import { makeStyles } from '@material-ui/core/styles';
 
 import HiddenCamera from './HiddenCamera';
 import * as actions from '../store/actions';
@@ -30,11 +31,15 @@ import {
   PATH_SESSION,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP
+  PATH_HELP,
+  PATH_ITEM_LOG,
+  PATH_ITEM_LOG_ALL
 } from '../constants';
 import CreateUserPage from './pages/CreateUserPage';
 import { theme } from '../utils/theme';
 import Test from './common/Test';
+import ItemLog from './Pages/ItemLog';
+import LogButton from './common/LogButton';
 
 function mapStyles(styles) {
   return {
@@ -50,7 +55,17 @@ function bounce(val) {
   });
 }
 
+const useStyles = makeStyles(theme => ({
+  logButton: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 99999
+  }
+}));
+
 const App = ({ appInit }) => {
+  const classes = useStyles();
   React.useEffect(() => {
     appInit();
   });
@@ -63,6 +78,9 @@ const App = ({ appInit }) => {
       {/* TODO: temp */}
       {/* <HiddenCamera /> */}
       <ThemeProvider theme={theme}>
+        <div className={classes.logButton}>
+          <LogButton showAll />
+        </div>
         <Box
           display="flex"
           flex="1"
@@ -85,6 +103,15 @@ const App = ({ appInit }) => {
               <Route path={PATH_NOT_RECOGNIZED} component={NotRecognizedPage} />
               <Route path={PATH_CREATE_USER} component={CreateUserPage} />
               <Route path={PATH_HELP} component={HelpPage} />
+              <Route exact path={PATH_ITEM_LOG} component={ItemLog} />
+              <Route
+                exact
+                path={PATH_ITEM_LOG_ALL}
+                render={routeProps => {
+                  console.log('>>> routeProps', routeProps);
+                  return <ItemLog {...routeProps} showAll />;
+                }}
+              />
             </AnimatedSwitch>
           </ConnectedRouter>
         </Box>

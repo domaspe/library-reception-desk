@@ -44,6 +44,9 @@ export const FACE_NOT_RECOGNIZED = 'FACE_NOT_RECOGNIZED';
 export const HIBERNATE = 'HIBERNATE';
 export const CREATE_USER = 'CREATE_USER';
 export const HELP = 'HELP';
+export const ITEM_LOG = 'ITEM_LOG';
+
+export const ERROR = 'ERROR';
 
 export function appInit() {
   return {
@@ -64,10 +67,11 @@ export function faceDetectFail() {
   };
 }
 
-export function saveFaceStart(label) {
+export function saveFace(label, withFace) {
   return {
     type: SAVE_FACE_START,
-    label
+    label,
+    withFace
   };
 }
 
@@ -272,5 +276,19 @@ export function createUser() {
 export function help() {
   return {
     type: HELP
+  };
+}
+
+export function itemLog(showAll) {
+  return {
+    type: ITEM_LOG,
+    showAll
+  };
+}
+
+export function error(message) {
+  return {
+    type: ERROR,
+    message
   };
 }

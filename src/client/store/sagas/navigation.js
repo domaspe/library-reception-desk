@@ -19,7 +19,9 @@ import {
   selectIsFaceScanPage,
   selectIsSessionPage,
   selectIsNotRecognizedPage,
-  selectIsHelpPage
+  selectIsHelpPage,
+  selectIsLogPage,
+  selectActiveUserId
 } from '../selectors';
 import {
   HIBERNATE_TIMEOUT,
@@ -28,7 +30,9 @@ import {
   PATH_SLEEP,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP
+  PATH_HELP,
+  PATH_ITEM_LOG,
+  PATH_ITEM_LOG_ALL
 } from '../../constants';
 import history from '../../utils/history';
 
@@ -115,6 +119,10 @@ function* help() {
   yield call(history.push, PATH_HELP);
 }
 
+function* itemLog({ showAll }) {
+  yield call(history.push, showAll ? PATH_ITEM_LOG_ALL : PATH_ITEM_LOG);
+}
+
 function* navigateToWelcomeOnEscape() {
   while (true) {
     const event = yield take(keydownChannel);
@@ -166,6 +174,15 @@ function* locationChange() {
       actions.startScanningFaces()
     );
   }
+
+  if (yield select(selectIsLogPage)) {
+    const userId = yield select(selectActiveUserId);
+    yield call(
+      waitForInactivity,
+      HIBERNATE_TIMEOUT,
+      userId ? actions.startSession(userId) : actions.startScanningFaces()
+    );
+  }
 }
 
 export default function* navigation() {
@@ -179,6 +196,7 @@ export default function* navigation() {
     yield takeLatest(actions.FACE_NOT_RECOGNIZED, faceNotRecognized),
     yield takeLatest(actions.CREATE_USER, createUser),
     yield takeLatest(actions.FACE_MATCH_SUCCESS, faceMatchSuccess),
-    yield takeLatest(actions.HELP, help)
+    yield takeLatest(actions.HELP, help),
+    yield takeLatest(actions.ITEM_LOG, itemLog)
   ]);
 }

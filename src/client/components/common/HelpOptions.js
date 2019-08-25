@@ -1,21 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import {
-  Button,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@material-ui/core';
+import { Button, MenuItem, Menu } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import * as actions from '../../store/actions';
 import * as selectors from '../../store/selectors';
+
+const ITEM_HEIGHT = 48;
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -27,22 +18,24 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const HelpOptions = ({ users, onClose, onCreate, onUserPick }) => {
-  const [open, setOpen] = useState(false);
-  const handleDialogOpen = () => setOpen(true);
-  const handleDialogClose = () => setOpen(false);
-  const handleChange = useCallback(event => {
-    const { value } = event.target;
-    if (!value) return;
-    onUserPick(value);
-  });
-
   const classes = useStyles();
+  const [userAnchorEl, setUserAnchorEl] = useState(null);
+  const handleUserMenuOpen = event => setUserAnchorEl(event.currentTarget);
+  const getUserClickHandler = userId => () => {
+    setUserAnchorEl(null);
+    if (!userId) return;
+
+    onUserPick(userId);
+  };
   return (
     <>
+      <Button color="primary" onClick={onClose} className={classes.button}>
+        Try again
+      </Button>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleDialogOpen}
+        onClick={handleUserMenuOpen}
         className={classes.button}
       >
         Choose existing user
@@ -55,42 +48,25 @@ const HelpOptions = ({ users, onClose, onCreate, onUserPick }) => {
       >
         Create new user
       </Button>
-      <Button color="primary" onClick={onClose} className={classes.button}>
-        Try again
-      </Button>
-
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        open={open}
-        onClose={handleDialogClose}
+      <Menu
+        id="existing-users"
+        anchorEl={userAnchorEl}
+        keepMounted
+        open={Boolean(userAnchorEl)}
+        onClose={getUserClickHandler()}
+        PaperProps={{
+          style: {
+            maxHeight: ITEM_HEIGHT * 4.5,
+            width: 200
+          }
+        }}
       >
-        <DialogTitle>Pick existing user</DialogTitle>
-        <DialogContent>
-          <Grid spacing={2} container justify="center" alignItems="center">
-            <Grid item xs={12} justify="center" alignItems="center" container>
-              <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="pick-existing-user">User</InputLabel>
-                <Select value="" onChange={handleChange}>
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {users.map(user => (
-                    <MenuItem key={user.id} value={user.id}>
-                      {user.id}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {users.map(user => (
+          <MenuItem key={user.id} onClick={getUserClickHandler(user.id)}>
+            {user.id}
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 };

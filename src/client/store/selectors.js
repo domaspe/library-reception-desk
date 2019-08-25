@@ -4,7 +4,6 @@ import {
   UPDATE_CLASS,
   FACE_DETECT_SUCCESS,
   LOAD_USERS,
-  QR_DETECT_SUCCESS,
   ASSIGN_ITEM_SUCCESS
 } from './actions';
 import {
@@ -14,7 +13,9 @@ import {
   PATH_SESSION,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP
+  PATH_HELP,
+  PATH_ITEM_LOG,
+  PATH_ITEM_LOG_ALL
 } from '../constants';
 import { itemToString } from '../utils/item';
 
@@ -98,10 +99,23 @@ export function selectShouldPauseScan(state) {
   return selectScanState(state).pause;
 }
 
-export function selectItems(state) {
-  return selectItemsState(state).items.sort(
-    (a, b) => new Date(b.dateTaken) - new Date(a.dateTaken)
-  );
+export function selectItems(state, sortBy = 'dateTaken') {
+  const { items } = selectItemsState(state);
+  if (sortBy === 'dateTaken') {
+    return items.sort((a, b) => new Date(b.dateTaken) - new Date(a.dateTaken));
+  }
+
+  if (sortBy === 'title') {
+    return items.sort((a, b) => {
+      if (a.primaryTitle > b.primaryTitle) return 1;
+      if (a.primaryTitle < b.primaryTitle) return -1;
+      if (a.secondaryTitle > b.secondaryTitle) return 1;
+      if (a.secondaryTitle < b.secondaryTitle) return -1;
+      return 0;
+    });
+  }
+
+  return items;
 }
 
 export function selectItemByCode(state, code) {
@@ -129,8 +143,14 @@ export function selectNotifyAssignItemAuccess(state) {
   );
 }
 
-export function selectUserItems(state, user) {
-  return selectItems(state).filter(item => String(item.user) === String(user));
+export function selectUserItems(state, user, sortBy) {
+  return selectItems(state, sortBy).filter(
+    item => String(item.user) === String(user)
+  );
+}
+
+export function selectFreeItems(state, sortBy) {
+  return selectItems(state, sortBy).filter(item => !item.dateTaken);
 }
 
 function selectPathname(state) {
@@ -161,6 +181,14 @@ export function selectIsCreateUserPage(state) {
 
 export function selectIsHelpPage(state) {
   return !!matchPath(selectPathname(state), { path: PATH_HELP });
+}
+
+export function selectIsLogPage(state) {
+  const pathname = selectPathname(state);
+  return (
+    !!matchPath(pathname, { path: PATH_ITEM_LOG }) ||
+    !!matchPath(pathname, { path: PATH_ITEM_LOG_ALL })
+  );
 }
 
 export function selectActiveUserId(state) {
