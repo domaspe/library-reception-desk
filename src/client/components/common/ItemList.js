@@ -1,5 +1,12 @@
 import React from 'react';
-import { Typography, IconButton, Paper, Grid, Box } from '@material-ui/core';
+import {
+  Typography,
+  IconButton,
+  Paper,
+  Grid,
+  Box,
+  Fade
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
@@ -15,21 +22,26 @@ import {
   selectActiveUserId,
   selectUserItems
 } from '../../store/selectors';
+import * as actions from '../../store/actions';
 
 const useStyles = makeStyles(theme => ({
   listContainer: {
     height: '50vh',
-    width: '100%'
+    width: '100%',
+    display: 'flex'
   },
   list: {
     maxHeight: '50vh',
     width: '100%',
     overflow: 'auto'
   },
+  empty: {
+    alignSelf: 'center',
+    width: '100%'
+  },
   item: {
     padding: theme.spacing(2),
     margin: theme.spacing(2),
-    paddingRight: theme.spacing(6),
     display: 'flex',
     position: 'relative',
     justifyContent: 'center',
@@ -49,17 +61,41 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ItemList = ({ show, ...props }) => {
+function shouldShowRemove(show, userId, dateTaken) {
+  return (show === 'all' && dateTaken) || (show === 'taken' && userId);
+}
+
+function shouldShowAdd(show, userId) {
+  return show === 'free' && userId;
+}
+
+const ItemList = ({ show, assignItem, ...props }) => {
   const { items, userId } = props;
   const classes = useStyles();
   return (
     <Box className={classes.listContainer}>
-      <Box className={classes.list}>
+      <Box className={classes.list} style={{}}>
+        <Fade in={!items.length}>
+          <Box p={2} style={{ position: 'absolute', width: '100%' }}>
+            <Typography
+              color="textPrimary"
+              align="center"
+              gutterBottom
+              className={classes.empty}
+              variant="body2"
+            >
+              Wow, such empty
+            </Typography>
+          </Box>
+        </Fade>
         <TransitionGroup>
           {items.map(item => {
             return (
-              <CSSTransition key={item.id} timeout={100} classNames="item">
-                <Paper className={classes.item}>
+              <CSSTransition key={item.id} timeout={200} classNames="item">
+                <Paper
+                  className={classes.item}
+                  title={`${item.primaryTitle}\nBy ${item.secondaryTitle}`}
+                >
                   <Grid container>
                     <Grid item xs={2}>
                       <Box
@@ -100,28 +136,20 @@ const ItemList = ({ show, ...props }) => {
                       </Box>
                     </Grid>
                   </Grid>
-                  {show === 'all' && item.dateTaken && (
+                  {shouldShowRemove(show, userId, item.dateTaken) && (
                     <IconButton
                       color="primary"
-                      onClick={() => alert('AssignmentReturnIcon')}
+                      onClick={() => assignItem(item.id, null)}
                     >
                       <CloseIcon />
                     </IconButton>
                   )}
-                  {show === 'free' && userId && (
+                  {shouldShowAdd(show, userId) && (
                     <IconButton
                       color="primary"
-                      onClick={() => alert('AddIcon')}
+                      onClick={() => assignItem(item.id, userId)}
                     >
                       <AddIcon />
-                    </IconButton>
-                  )}
-                  {show === 'taken' && userId && (
-                    <IconButton
-                      color="primary"
-                      onClick={() => alert('CloseIcon')}
-                    >
-                      <CloseIcon />
                     </IconButton>
                   )}
                 </Paper>
@@ -135,7 +163,8 @@ const ItemList = ({ show, ...props }) => {
 };
 
 ItemList.propTypes = {
-  show: PropTypes.oneOf(['all', 'taken', 'free']).isRequired
+  show: PropTypes.oneOf(['all', 'taken', 'free']).isRequired,
+  assignItem: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -152,7 +181,9 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  assignItem: actions.tryAssignItem
+};
 
 export default connect(
   mapStateToProps,

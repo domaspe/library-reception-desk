@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography, Tabs, Tab, Box, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
+import SwipeableViews from 'react-swipeable-views';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import AddIcon from '@material-ui/icons/Add';
 import {
   selectActiveUserId,
   selectNotifyAssignItemAuccess
@@ -14,15 +18,31 @@ import { useIconAnimation } from '../../utils/hooks';
 import ItemList from '../common/ItemList';
 import LogButton from '../common/LogButton';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   name: {
     fontWeight: 'bold'
+  },
+  tabs: {
+    width: '100%'
+  },
+  swipeable: {
+    backgroundColor: theme.palette.background.paper,
+    width: '100%'
+  },
+  tabText: {
+    padding: theme.spacing(2, 2, 0, 2)
+  },
+  tabContent: {
+    paddingBottom: theme.spacing(2)
   }
 }));
 
 const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
   const classes = useStyles();
   const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
+  const [tab, setTab] = React.useState(0);
+  const handleTabChange = (event, newValue) => setTab(newValue);
+  const handleSwipeChange = index => setTab(index);
 
   return (
     <Layout
@@ -32,7 +52,7 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
       titleComponent={
         <>
           <Typography
-            variant="h4"
+            variant="h6"
             color="textPrimary"
             align="center"
             className={classes.greeting}
@@ -40,7 +60,7 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
             Hey there,&nbsp;
           </Typography>
           <Typography
-            variant="h4"
+            variant="h6"
             color="textPrimary"
             align="center"
             className={classes.name}
@@ -54,15 +74,52 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
           <Button variant="contained" color="primary" onClick={onLogout}>
             End session
           </Button>
-          <LogButton text="Add item manually" />
         </>
       }
     >
-      <Typography color="textPrimary" gutterBottom>
-        Below are the devices that you’ve taken out. If you want to take/return
-        a device, face the QR code on the back of the device towards the camera.
-      </Typography>
-      <ItemList show="taken" />
+      <AppBar position="relative" color="default">
+        <Tabs
+          value={tab}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          indicatorColor="primary"
+          textColor="primary"
+          className={classes.tabs}
+        >
+          <Tab label="Taken items" />
+          <Tab label="Free items" />
+        </Tabs>
+      </AppBar>
+      <SwipeableViews
+        index={tab}
+        onChangeIndex={handleSwipeChange}
+        className={classes.swipeable}
+      >
+        <>
+          <div className={classes.tabText}>
+            <Typography color="textPrimary" gutterBottom>
+              Below are the devices that you’ve taken out. If you want to
+              take/return a device, face the QR code on the back of the device
+              towards the camera.
+            </Typography>
+          </div>
+          <div className={classes.tabContent}>
+            <ItemList show="taken" />
+          </div>
+        </>
+        <Box>
+          <div className={classes.tabText}>
+            <Typography color="textPrimary" align="center" gutterBottom>
+              Here you can see all items still available. Click on&nbsp;
+              <AddIcon />
+              &nbsp; to reserve the item.
+            </Typography>
+          </div>
+          <div className={classes.tabContent}>
+            <ItemList show="free" />
+          </div>
+        </Box>
+      </SwipeableViews>
     </Layout>
   );
 };

@@ -14,8 +14,7 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  PATH_ITEM_LOG,
-  PATH_ITEM_LOG_ALL
+  PATH_ITEM_LOG
 } from '../constants';
 import { itemToString } from '../utils/item';
 
@@ -184,11 +183,7 @@ export function selectIsHelpPage(state) {
 }
 
 export function selectIsLogPage(state) {
-  const pathname = selectPathname(state);
-  return (
-    !!matchPath(pathname, { path: PATH_ITEM_LOG }) ||
-    !!matchPath(pathname, { path: PATH_ITEM_LOG_ALL })
-  );
+  return !!matchPath(selectPathname(state), { path: PATH_ITEM_LOG });
 }
 
 export function selectActiveUserId(state) {

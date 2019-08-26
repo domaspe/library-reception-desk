@@ -279,10 +279,9 @@ export function help() {
   };
 }
 
-export function itemLog(showAll) {
+export function itemLog() {
   return {
-    type: ITEM_LOG,
-    showAll
+    type: ITEM_LOG
   };
 }
 

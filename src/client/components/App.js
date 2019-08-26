@@ -32,8 +32,7 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  PATH_ITEM_LOG,
-  PATH_ITEM_LOG_ALL
+  PATH_ITEM_LOG
 } from '../constants';
 import CreateUserPage from './pages/CreateUserPage';
 import { theme } from '../utils/theme';
@@ -104,14 +103,6 @@ const App = ({ appInit }) => {
               <Route path={PATH_CREATE_USER} component={CreateUserPage} />
               <Route path={PATH_HELP} component={HelpPage} />
               <Route exact path={PATH_ITEM_LOG} component={ItemLog} />
-              <Route
-                exact
-                path={PATH_ITEM_LOG_ALL}
-                render={routeProps => {
-                  console.log('>>> routeProps', routeProps);
-                  return <ItemLog {...routeProps} showAll />;
-                }}
-              />
             </AnimatedSwitch>
           </ConnectedRouter>
         </Box>

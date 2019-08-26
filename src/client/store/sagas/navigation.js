@@ -31,8 +31,7 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  PATH_ITEM_LOG,
-  PATH_ITEM_LOG_ALL
+  PATH_ITEM_LOG
 } from '../../constants';
 import history from '../../utils/history';
 
@@ -119,8 +118,8 @@ function* help() {
   yield call(history.push, PATH_HELP);
 }
 
-function* itemLog({ showAll }) {
-  yield call(history.push, showAll ? PATH_ITEM_LOG_ALL : PATH_ITEM_LOG);
+function* itemLog() {
+  yield call(history.push, PATH_ITEM_LOG);
 }
 
 function* navigateToWelcomeOnEscape() {

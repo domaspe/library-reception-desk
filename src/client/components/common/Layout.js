@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
     margin: '0 auto',
-    marginBottom: theme.spacing(2)
+    marginTop: theme.spacing(2)
   },
   iconSmall: {
     height: 40,

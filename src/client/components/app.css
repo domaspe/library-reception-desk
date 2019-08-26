@@ -52,7 +52,7 @@ body {
 .item-exit-active {
   opacity: 0;
   transform: scale(0);
-  transition: all 100ms ease-out;
+  transition: all 200ms ease-out !important;
 }
 
 .item-enter {
@@ -62,5 +62,5 @@ body {
 .item-enter-active {
   opacity: 1;
   transform: scale(1);
-  transition: all 100ms ease-out;
+  transition: all 200ms ease-out !important;
 }
