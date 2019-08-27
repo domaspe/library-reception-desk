@@ -186,7 +186,6 @@ function* locationChange() {
 
 export default function* navigation() {
   yield all([
-    // TODO: temp
     // yield takeLatest(LOCATION_CHANGE, locationChange),
     yield takeLatest(actions.START_SESSION, startSession),
     yield takeLatest(actions.END_SESSION, endSession),

@@ -1,7 +1,8 @@
 import { FACE_DETECT_SUCCESS, FACE_DETECT_FAIL } from '../actions';
 
 const initialState = {
-  status: ''
+  status: '',
+  consecutiveFails: 0
 };
 
 export default function face(state = initialState, action) {

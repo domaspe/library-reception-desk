@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Typography, Tabs, Tab, Box, AppBar } from '@material-ui/core';
+import {
+  Button,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+  AppBar,
+  Badge
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import SwipeableViews from 'react-swipeable-views';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import AddIcon from '@material-ui/icons/Add';
 import {
   selectActiveUserId,
-  selectNotifyAssignItemAuccess
+  selectNotifyAssignItemAuccess,
+  selectFreeItems,
+  selectUserItems
 } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
 import { useIconAnimation } from '../../utils/hooks';
 import ItemList from '../common/ItemList';
-import LogButton from '../common/LogButton';
 
 const useStyles = makeStyles(theme => ({
   name: {
@@ -34,15 +40,28 @@ const useStyles = makeStyles(theme => ({
   },
   tabContent: {
     paddingBottom: theme.spacing(2)
+  },
+  badge: {
+    padding: theme.spacing(0, 2)
   }
 }));
 
-const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
+const SessionPage = ({
+  userId,
+  onLogout,
+  freeItems,
+  userItems,
+  assignItemSuccess,
+  assignItem
+}) => {
   const classes = useStyles();
   const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
   const [tab, setTab] = React.useState(0);
   const handleTabChange = (event, newValue) => setTab(newValue);
   const handleSwipeChange = index => setTab(index);
+
+  const handleAddItemClick = useCallback(itemId => assignItem(itemId, userId));
+  const handlRemoveItemClick = useCallback(itemId => assignItem(itemId, null));
 
   return (
     <Layout
@@ -71,7 +90,7 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
       }
       actions={
         <>
-          <Button variant="contained" color="primary" onClick={onLogout}>
+          <Button color="primary" onClick={onLogout}>
             End session
           </Button>
         </>
@@ -86,8 +105,22 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
           textColor="primary"
           className={classes.tabs}
         >
-          <Tab label="Taken items" />
-          <Tab label="Free items" />
+          <Tab
+            label={
+              userItems.length > 0 ? (
+                <Badge
+                  className={classes.badge}
+                  color="primary"
+                  badgeContent={userItems.length}
+                >
+                  Your items
+                </Badge>
+              ) : (
+                'Your items'
+              )
+            }
+          />
+          <Tab label="Add items manually" />
         </Tabs>
       </AppBar>
       <SwipeableViews
@@ -104,7 +137,7 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
             </Typography>
           </div>
           <div className={classes.tabContent}>
-            <ItemList show="taken" />
+            <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
           </div>
         </>
         <Box>
@@ -116,7 +149,11 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
             </Typography>
           </div>
           <div className={classes.tabContent}>
-            <ItemList show="free" />
+            <ItemList
+              items={freeItems}
+              onItemClick={handleAddItemClick}
+              showAdd
+            />
           </div>
         </Box>
       </SwipeableViews>
@@ -126,19 +163,24 @@ const SessionPage = ({ userId, onLogout, assignItemSuccess }) => {
 
 SessionPage.propTypes = {
   onLogout: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired
+  assignItem: PropTypes.func.isRequired,
+  userId: PropTypes.string.isRequired,
+  freeItems: PropTypes.array.isRequired,
+  userItems: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => {
   const userId = selectActiveUserId(state);
   return {
     userId,
-    assignItemSuccess: selectNotifyAssignItemAuccess(state)
+    assignItemSuccess: selectNotifyAssignItemAuccess(state),
+    freeItems: selectFreeItems(state, 'title'),
+    userItems: selectUserItems(state, userId, 'dateTaken')
   };
 };
 
 const mapDispatchToProps = {
-  tryAssignItem: actions.tryAssignItem,
+  assignItem: actions.tryAssignItem,
   onLogout: actions.endSession
 };
 

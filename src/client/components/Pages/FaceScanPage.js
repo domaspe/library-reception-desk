@@ -6,6 +6,7 @@ import Layout from '../common/Layout';
 import { selectNotifyAssignItemAuccess } from '../../store/selectors';
 import { useIconAnimation } from '../../utils/hooks';
 import HelpButton from '../common/HelpButton';
+import ChooseUserButton from '../common/ChooseUserButton';
 
 const FaceScanPage = ({ assignItemSuccess }) => {
   const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
@@ -14,7 +15,12 @@ const FaceScanPage = ({ assignItemSuccess }) => {
       iconSrc="/assets/faceid-happy.svg"
       animateIcon={animateIcon}
       onIconAnimationEnd={onIconAnimationEnd}
-      actions={<HelpButton />}
+      actions={
+        <>
+          <ChooseUserButton />
+          <HelpButton />
+        </>
+      }
       titleComponent={
         <Typography variant="h6" color="textPrimary" align="center">
           Look straight into the camera to get started.

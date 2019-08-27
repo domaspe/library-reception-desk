@@ -5,8 +5,8 @@ import classNames from 'classnames';
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    height: 100,
-    width: 100,
+    height: 60,
+    width: 60,
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     minWidth: 400,
     maxWidth: 900,
     margin: '0 auto',
-    padding: theme.spacing(4)
+    padding: theme.spacing(2)
   },
   box: {
     display: 'flex',

@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Button, MenuItem, Menu } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import * as actions from '../../store/actions';
-import * as selectors from '../../store/selectors';
-
-const ITEM_HEIGHT = 48;
+import ChooseUserButton from './ChooseUserButton';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -17,29 +15,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const HelpOptions = ({ users, onClose, onCreate, onUserPick }) => {
+const HelpOptions = ({ onClose, onCreate }) => {
   const classes = useStyles();
-  const [userAnchorEl, setUserAnchorEl] = useState(null);
-  const handleUserMenuOpen = event => setUserAnchorEl(event.currentTarget);
-  const getUserClickHandler = userId => () => {
-    setUserAnchorEl(null);
-    if (!userId) return;
-
-    onUserPick(userId);
-  };
   return (
     <>
-      <Button color="primary" onClick={onClose} className={classes.button}>
-        Try again
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleUserMenuOpen}
-        className={classes.button}
-      >
-        Choose existing user
-      </Button>
+      <ChooseUserButton />
       <Button
         variant="contained"
         color="primary"
@@ -48,46 +28,24 @@ const HelpOptions = ({ users, onClose, onCreate, onUserPick }) => {
       >
         Create new user
       </Button>
-      <Menu
-        id="existing-users"
-        anchorEl={userAnchorEl}
-        keepMounted
-        open={Boolean(userAnchorEl)}
-        onClose={getUserClickHandler()}
-        PaperProps={{
-          style: {
-            maxHeight: ITEM_HEIGHT * 4.5,
-            width: 200
-          }
-        }}
-      >
-        {users.map(user => (
-          <MenuItem key={user.id} onClick={getUserClickHandler(user.id)}>
-            {user.id}
-          </MenuItem>
-        ))}
-      </Menu>
+      <Button color="primary" onClick={onClose} className={classes.button}>
+        Try again
+      </Button>
     </>
   );
 };
 
 HelpOptions.propTypes = {
   onClose: PropTypes.func.isRequired,
-  onCreate: PropTypes.func.isRequired,
-  onUserPick: PropTypes.func.isRequired
+  onCreate: PropTypes.func.isRequired
 };
-
-const mapStateToProps = state => ({
-  users: selectors.selectUsers(state)
-});
 
 const mapDispatchToProps = {
   onClose: actions.startScanningFaces,
-  onCreate: actions.createUser,
-  onUserPick: actions.startSession
+  onCreate: actions.createUser
 };
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(HelpOptions);

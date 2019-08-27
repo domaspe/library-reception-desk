@@ -74,11 +74,10 @@ const App = ({ appInit }) => {
       {/* TODO: temp */}
       <Test />
       <CssBaseline />
-      {/* TODO: temp */}
-      {/* <HiddenCamera /> */}
+      <HiddenCamera />
       <ThemeProvider theme={theme}>
         <div className={classes.logButton}>
-          <LogButton showAll />
+          <LogButton />
         </div>
         <Box
           display="flex"

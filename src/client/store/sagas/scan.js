@@ -19,8 +19,9 @@ import {
   selectIsSavingFace,
   selectIsFaceScanPage,
   selectIsSessionPage,
-  selectAllFaceMatchAttemptsFailed,
-  selectIsHibernatedPage
+  selectFaceCannotBeMatched,
+  selectIsHibernatedPage,
+  selectFaceMissingForHistory
 } from '../selectors';
 import fetch from '../../utils/fetch';
 import * as face from '../../utils/face';
@@ -45,7 +46,6 @@ const SCAN_UNPAUSED = 'sagas/scan/SCAN_UNPAUSED';
 
 function* scanFaceWorker() {
   let callNextDetectionFail = false;
-  // let callNextMatchFail = true;
   while (true) {
     if (scanPaused) {
       yield take(SCAN_UNPAUSED);
@@ -72,18 +72,20 @@ function* scanFaceWorker() {
       callNextDetectionFail = false;
     }
 
-    // const matchFailRecorded = yield select(selectIsFaceMatchFailed);
     if (isFaceMatched) {
-      // callNextMatchFail = true;
       yield put(actions.faceMatchSuccess(result.match.label));
     } else if (isFaceDetected) {
-      // callNextMatchFail = false;
       yield put(actions.faceMatchFail());
     }
 
-    const matchAttemptsFailed = yield select(selectAllFaceMatchAttemptsFailed);
-    if (!isSavingFace && matchAttemptsFailed) {
+    const faceCannotBeMatched = yield select(selectFaceCannotBeMatched);
+    if (!isSavingFace && faceCannotBeMatched) {
       yield put(actions.faceNotRecognized());
+    }
+
+    const faceMissingForHistory = yield select(selectFaceMissingForHistory);
+    if (isSavingFace && faceMissingForHistory) {
+      yield put(actions.updateClassFail());
     }
 
     if (yield select(selectIsFaceScanPage)) {

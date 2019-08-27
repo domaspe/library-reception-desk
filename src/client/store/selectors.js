@@ -14,7 +14,8 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  PATH_ITEM_LOG
+  PATH_ITEM_LOG,
+  MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
 } from '../constants';
 import { itemToString } from '../utils/item';
 
@@ -74,8 +75,18 @@ export function selectFaceMatchLabel(state) {
   return selectFaceMatchState(state).label;
 }
 
-export function selectAllFaceMatchAttemptsFailed(state) {
-  return selectFaceMatchState(state).consecutiveFails > 15;
+export function selectFaceCannotBeMatched(state) {
+  return (
+    selectFaceMatchState(state).consecutiveFails >
+    MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
+  );
+}
+
+export function selectFaceMissingForHistory(state) {
+  return (
+    selectFaceHistoryState(state).consecutiveFails >
+    MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
+  );
 }
 
 export function selectQrCode(state) {

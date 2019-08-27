@@ -26,7 +26,7 @@ const LogButton = ({ show, onClick }) => {
 
 LogButton.propTypes = {
   onClick: PropTypes.func.isRequired,
-  show: PropTypes.string
+  show: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => {

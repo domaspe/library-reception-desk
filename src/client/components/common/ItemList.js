@@ -10,19 +10,10 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-
-import {
-  selectItems,
-  selectFreeItems,
-  selectActiveUserId,
-  selectUserItems
-} from '../../store/selectors';
-import * as actions from '../../store/actions';
 
 const useStyles = makeStyles(theme => ({
   listContainer: {
@@ -33,7 +24,8 @@ const useStyles = makeStyles(theme => ({
   list: {
     maxHeight: '50vh',
     width: '100%',
-    overflow: 'auto'
+    overflowY: 'auto',
+    overflowX: 'hidden'
   },
   empty: {
     alignSelf: 'center',
@@ -45,7 +37,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     position: 'relative',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    height: 100
   },
   user: {
     fontWeight: 'bold'
@@ -61,16 +54,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function shouldShowRemove(show, userId, dateTaken) {
-  return (show === 'all' && dateTaken) || (show === 'taken' && userId);
-}
-
-function shouldShowAdd(show, userId) {
-  return show === 'free' && userId;
-}
-
-const ItemList = ({ show, assignItem, ...props }) => {
-  const { items, userId } = props;
+const ItemList = ({ onItemClick, items, showAdd }) => {
   const classes = useStyles();
   return (
     <Box className={classes.listContainer}>
@@ -91,7 +75,7 @@ const ItemList = ({ show, assignItem, ...props }) => {
         <TransitionGroup>
           {items.map(item => {
             return (
-              <CSSTransition key={item.id} timeout={200} classNames="item">
+              <CSSTransition key={item.id} timeout={300} classNames="item">
                 <Paper
                   className={classes.item}
                   title={`${item.primaryTitle}\nBy ${item.secondaryTitle}`}
@@ -113,7 +97,7 @@ const ItemList = ({ show, assignItem, ...props }) => {
                         <Typography className={classes.secondaryTitle} noWrap>
                           {item.secondaryTitle}
                         </Typography>
-                        {item.dateTaken ? (
+                        {!!item.dateTaken && (
                           <>
                             <Typography variant="caption">
                               Taken&nbsp;
@@ -128,28 +112,24 @@ const ItemList = ({ show, assignItem, ...props }) => {
                               {item.user}
                             </Typography>
                           </>
-                        ) : (
-                          show === 'all' && (
-                            <Typography variant="caption">&nbsp;</Typography>
-                          )
                         )}
                       </Box>
                     </Grid>
                   </Grid>
-                  {shouldShowRemove(show, userId, item.dateTaken) && (
+                  {showAdd && (
                     <IconButton
                       color="primary"
-                      onClick={() => assignItem(item.id, null)}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  )}
-                  {shouldShowAdd(show, userId) && (
-                    <IconButton
-                      color="primary"
-                      onClick={() => assignItem(item.id, userId)}
+                      onClick={() => onItemClick(item.id)}
                     >
                       <AddIcon />
+                    </IconButton>
+                  )}
+                  {!showAdd && !!item.dateTaken && (
+                    <IconButton
+                      color="primary"
+                      onClick={() => onItemClick(item.id)}
+                    >
+                      <CloseIcon />
                     </IconButton>
                   )}
                 </Paper>
@@ -163,29 +143,9 @@ const ItemList = ({ show, assignItem, ...props }) => {
 };
 
 ItemList.propTypes = {
-  show: PropTypes.oneOf(['all', 'taken', 'free']).isRequired,
-  assignItem: PropTypes.func.isRequired
+  onItemClick: PropTypes.func.isRequired,
+  items: PropTypes.array.isRequired,
+  showAdd: PropTypes.bool
 };
 
-const mapStateToProps = (state, ownProps) => {
-  const userId = selectActiveUserId(state);
-  return {
-    items:
-      // eslint-disable-next-line no-nested-ternary
-      ownProps.show === 'all'
-        ? selectItems(state, 'title')
-        : ownProps.show === 'taken'
-        ? selectUserItems(state, userId, 'dateTaken')
-        : selectFreeItems(state, 'title'),
-    userId
-  };
-};
-
-const mapDispatchToProps = {
-  assignItem: actions.tryAssignItem
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ItemList);
+export default ItemList;
