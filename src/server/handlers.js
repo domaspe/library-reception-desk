@@ -3,6 +3,8 @@ const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const items = require('../../data/defaultItems.json');
 
+const STATUS_ASSIGN_SUCCESS = 'STATUS_ASSIGN_SUCCESS';
+const STATUS_UNASSIGN_SUCCESS = 'STATUS_UNASSIGN_SUCCESS';
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
 const STATUS_FAIL = 'STATUS_FAIL';
 
@@ -67,33 +69,24 @@ function getItem(itemId) {
     .value();
 }
 
-function unassignUser(itemId) {
-  const item = getItem(itemId);
-
-  if (!item) {
-    return null;
-  }
-
-  if (item.user) {
-    updateAssignment(itemId, null);
-    console.log('success');
-    return STATUS_SUCCESS;
-  }
-
-  return STATUS_FAIL;
-}
-
-function assignUser(itemId, user) {
+function toggleUser(itemId, user) {
   const itemExists = exists('items', { id: itemId });
   if (!itemExists) {
     return STATUS_FAIL;
   }
-
   // assign
-  const userExists = exists('users', { id: user });
-  if (userExists) {
-    updateAssignment(itemId, user);
-    return STATUS_SUCCESS;
+  const item = getItem(itemId);
+  if (item.user && (item.user === user || !user)) {
+    updateAssignment(itemId, null);
+    return STATUS_ASSIGN_SUCCESS;
+  }
+
+  if (!item.user) {
+    const userExists = exists('users', { id: user });
+    if (userExists) {
+      updateAssignment(itemId, user);
+      return STATUS_UNASSIGN_SUCCESS;
+    }
   }
 
   return STATUS_FAIL;
@@ -112,9 +105,8 @@ module.exports = {
   getDescriptors,
   getItems,
   updateOrAddDescriptors,
-  assignUser,
+  toggleUser,
   updateOrAddUser,
-  unassignUser,
   getUsers,
   STATUS_SUCCESS,
   STATUS_FAIL

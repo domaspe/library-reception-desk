@@ -7,7 +7,10 @@ import {
   select,
   delay
 } from 'redux-saga/effects';
+import UIfx from 'uifx';
 
+import assignAudio from '../../../../assets/assign.mp3';
+import unassignAudio from '../../../../assets/unassign.mp3';
 import * as actions from '../actions';
 import { waitFor } from '../../utils/sagas';
 import {
@@ -16,6 +19,15 @@ import {
 } from '../selectors';
 import fetch from '../../utils/fetch';
 import { mapFloat32ArrayToArr } from '../../utils/float32Array';
+
+const assignFx = new UIfx(assignAudio, {
+  volume: 0.4, // number between 0.0 ~ 1.0
+  throttleMs: 100
+});
+const unassignFx = new UIfx(unassignAudio, {
+  volume: 0.4, // number between 0.0 ~ 1.0
+  throttleMs: 100
+});
 
 function* appInit() {
   yield call(fetch, '/api/reload', 'GET');
@@ -71,9 +83,18 @@ function* tryAssignItem({ itemId, userId }) {
     user: userId
   });
 
-  if (clearResponse.status === 'STATUS_SUCCESS') {
+  if (
+    clearResponse.status === 'STATUS_ASSIGN_SUCCESS' ||
+    clearResponse.status === 'STATUS_UNASSIGN_SUCCESS'
+  ) {
     yield call(loadItems);
     yield put(actions.assignItemSuccess());
+
+    if (clearResponse.status === 'STATUS_ASSIGN_SUCCESS') {
+      yield call(assignFx.play);
+    } else {
+      yield call(unassignFx.play);
+    }
     return;
   }
 

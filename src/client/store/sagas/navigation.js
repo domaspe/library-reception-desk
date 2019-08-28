@@ -12,6 +12,7 @@ import {
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import { LOCATION_CHANGE } from 'connected-react-router';
+import UIfx from 'uifx';
 
 import * as actions from '../actions';
 import {
@@ -31,6 +32,12 @@ import {
   PATH_HELP
 } from '../../constants';
 import history from '../../utils/history';
+import loginAudio from '../../../../assets/login.mp3';
+
+const loginFx = new UIfx(loginAudio, {
+  volume: 0.4, // number between 0.0 ~ 1.0
+  throttleMs: 100
+});
 
 const keydownChannel = eventChannel(emitter => {
   document.addEventListener('keydown', emitter);
@@ -91,6 +98,7 @@ function* waitForInactivity(timeout, action) {
 
 function* startSession({ userId }) {
   yield put(actions.setActiveUser(userId));
+  yield call(loginFx.play);
   yield call(history.push, PATH_SESSION);
 }
 
@@ -104,6 +112,9 @@ function* startScanningFaces() {
 }
 
 function* faceMatchSuccess({ label }) {
+  if (yield select(selectIsHibernatedPage)) {
+    yield delay(500); // a little delay to show nabigation animation
+  }
   yield put(actions.startSession(label));
 }
 

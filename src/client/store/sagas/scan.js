@@ -21,7 +21,8 @@ import {
   selectIsSessionPage,
   selectFaceCannotBeMatched,
   selectIsHibernatedPage,
-  selectFaceMissingForHistory
+  selectFaceMissingForHistory,
+  selectActiveUserId
 } from '../selectors';
 import fetch from '../../utils/fetch';
 import * as face from '../../utils/face';
@@ -41,14 +42,14 @@ import {
 const animationFrame = () =>
   new Promise(resolve => requestAnimationFrame(resolve));
 
-let scanPaused = false;
-const SCAN_UNPAUSED = 'sagas/scan/SCAN_UNPAUSED';
+let faceScanPaused = false;
+const FACE_SCAN_UNPAUSED = 'sagas/scan/FACE_SCAN_UNPAUSED';
 
 function* scanFaceWorker() {
   let callNextDetectionFail = false;
   while (true) {
-    if (scanPaused) {
-      yield take(SCAN_UNPAUSED);
+    if (faceScanPaused) {
+      yield take(FACE_SCAN_UNPAUSED);
     }
 
     const isSavingFace = yield select(selectIsSavingFace);
@@ -88,15 +89,17 @@ function* scanFaceWorker() {
       yield put(actions.updateClassFail());
     }
 
-    if (yield select(selectIsFaceScanPage)) {
-      yield delay(FACE_QUICK_SCAN_INTERVAL);
-    } else if (yield select(selectIsHibernatedPage)) {
-      yield race([
-        delay(FACE_SLOW_SCAN_INTERVAL),
-        call(waitFor, selectIsFaceScanPage)
-      ]);
-    } else {
-      yield delay(FACE_SLOW_SCAN_INTERVAL);
+    if (!faceScanPaused) {
+      if (yield select(selectIsFaceScanPage)) {
+        yield delay(FACE_QUICK_SCAN_INTERVAL);
+      } else if (yield select(selectIsHibernatedPage)) {
+        yield race([
+          delay(FACE_SLOW_SCAN_INTERVAL),
+          call(waitFor, selectIsFaceScanPage)
+        ]);
+      } else {
+        yield delay(FACE_SLOW_SCAN_INTERVAL);
+      }
     }
   }
 }
@@ -127,7 +130,8 @@ function* scanQrWorker() {
         if (code.data !== prevCode) {
           callNextFail = true;
           yield put(actions.qrDetectSuccess(code.data));
-          yield put(actions.tryAssignItem(code.data));
+          const userId = yield select(selectActiveUserId);
+          yield put(actions.tryAssignItem(code.data, userId));
           yield delay(TIMEOUT_AFTER_ASSIGN);
         }
       } else if (callNextFail) {
@@ -136,10 +140,15 @@ function* scanQrWorker() {
       }
     }
 
-    if (yield select(selectIsSessionPage)) {
+    const isSessionPage = yield select(selectIsSessionPage);
+    const isFaceScanPage = yield select(selectIsFaceScanPage);
+    if (isSessionPage || isFaceScanPage) {
       yield call(animationFrame);
     } else {
-      yield call(waitFor, selectIsSessionPage);
+      yield race([
+        call(waitFor, selectIsSessionPage),
+        call(waitFor, selectIsFaceScanPage)
+      ]);
     }
   }
 }
@@ -153,13 +162,13 @@ function* faceScanRegulatorWorker() {
     ]);
 
     if (faceIsMatched) {
-      scanPaused = true;
+      faceScanPaused = true;
       yield take(actions.START_SCANNING_FACES);
       yield delay(FACE_SLOW_SCAN_INTERVAL * 3); // Also wait some time, so the same person is not logged in
     }
 
     if (faceIsNotRecognized) {
-      scanPaused = true;
+      faceScanPaused = true;
       yield race([
         take(actions.START_SCANNING_FACES),
         take(actions.SAVE_FACE_START)
@@ -168,13 +177,13 @@ function* faceScanRegulatorWorker() {
     }
 
     if (navigatedToHelp) {
-      scanPaused = true;
+      faceScanPaused = true;
       yield take(actions.START_SCANNING_FACES);
       yield delay(FACE_SLOW_SCAN_INTERVAL);
     }
 
-    scanPaused = false;
-    yield put({ type: SCAN_UNPAUSED });
+    faceScanPaused = false;
+    yield put({ type: FACE_SCAN_UNPAUSED });
   }
 }
 

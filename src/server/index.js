@@ -58,10 +58,7 @@ app.post('/api/users', (req, res) => {
 
 app.post('/api/items/:id', (req, res) => {
   const { user } = req.body;
-  const status = user
-    ? handlers.assignUser(Number(req.params.id), user)
-    : handlers.unassignUser(Number(req.params.id));
-
+  const status = handlers.toggleUser(Number(req.params.id), user);
   res.status(200).json({
     status
   });

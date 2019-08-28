@@ -13,7 +13,6 @@ export default function users(state = initialState, action) {
   switch (action.type) {
     case SET_ITEMS_DRAWER_STATE:
       return { ...state, open: action.open };
-    case START_SESSION:
     case START_SCANNING_FACES:
     case HIBERNATE:
       return { ...state, open: false };

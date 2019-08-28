@@ -11,7 +11,12 @@ import {
   Typography,
   Stepper,
   Step,
-  StepLabel
+  StepLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
@@ -53,11 +58,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CreateUserPage = ({ progress, onSaveFace, onCancel, isSendingData }) => {
+const CreateUserPage = ({
+  users,
+  progress,
+  onSaveFace,
+  onCancel,
+  isSendingData
+}) => {
   const classes = useStyles();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [saveFace, setSaveFace] = useState(true);
+  const [showUserExists, setShowUserExists] = useState(false);
 
   const handleNameChange = useCallback(event => {
     setName(event.target.value);
@@ -65,21 +77,42 @@ const CreateUserPage = ({ progress, onSaveFace, onCancel, isSendingData }) => {
   const handleSaveFaceChange = useCallback(event =>
     setSaveFace(!!event.target.checked)
   );
+  const handleUserExistsCancel = useCallback(() => setShowUserExists(false));
 
-  const goToStep = useCallback(
-    newStep => event => {
-      event.preventDefault();
+  const goToNextStep = useCallback(
+    (newStep, overwriteUser) => {
+      if (newStep === 1) {
+        const userExists = users.find(user => user.id === name);
+        if (userExists && !overwriteUser) {
+          setShowUserExists(true);
+          return;
+        }
+      }
+
       setStep(newStep);
 
       if (newStep === 2) {
         onSaveFace(name, saveFace);
       }
     },
-    [name, saveFace]
+    [name, saveFace, users]
   );
 
+  const handleFormSubmit = useCallback(
+    newStep => event => {
+      event.preventDefault();
+      goToNextStep(newStep);
+    },
+    [name, saveFace, users]
+  );
+
+  const handleUserExistsConfirm = useCallback(() => {
+    setShowUserExists(false);
+    goToNextStep(step + 1, true);
+  }, [step]);
+
   return (
-    <form autoComplete="off" onSubmit={goToStep(step + 1)}>
+    <form autoComplete="off" onSubmit={handleFormSubmit(step + 1)}>
       <Layout
         iconSrc="/assets/facial-recognition.svg"
         titleComponent={
@@ -104,7 +137,7 @@ const CreateUserPage = ({ progress, onSaveFace, onCancel, isSendingData }) => {
                 color="primary"
                 type="button"
                 className={classes.button}
-                onClick={goToStep(step - 1)}
+                onClick={handleFormSubmit(step - 1)}
               >
                 <NavigateBefore className={classes.leftIcon} />
                 Back
@@ -152,6 +185,28 @@ const CreateUserPage = ({ progress, onSaveFace, onCancel, isSendingData }) => {
                     title: '3 to 35 characters'
                   }}
                 />
+                <Dialog open={showUserExists} onClose={handleUserExistsCancel}>
+                  <DialogTitle>User exists</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                      User with the same name already exists. Do you want to
+                      overwrite face data?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleUserExistsCancel} color="primary">
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleUserExistsConfirm}
+                      color="primary"
+                      variant="contained"
+                      autoFocus
+                    >
+                      Overwrite
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </div>
             )}
             {step === 1 && (
@@ -201,11 +256,13 @@ CreateUserPage.propTypes = {
   progress: PropTypes.number.isRequired,
   onSaveFace: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  isSendingData: PropTypes.bool.isRequired
+  isSendingData: PropTypes.bool.isRequired,
+  users: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
   progress: selectors.selectFaceDataCollectedPercentage(state) * 0.8,
+  users: selectors.selectUsers(state),
   isSendingData:
     selectors.selectIsUpdatingClass(state) ||
     selectors.selectIsLoadingUsers(state)

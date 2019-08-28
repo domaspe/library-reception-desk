@@ -118,6 +118,10 @@ export function selectUserItems(state, user, sortBy) {
   );
 }
 
+export function selectUserHasItem(state, user, itemId) {
+  return !!selectUserItems(state, user).find(item => item.id === itemId);
+}
+
 export function selectFreeItems(state, sortBy) {
   return selectItems(state, sortBy).filter(item => !item.dateTaken);
 }

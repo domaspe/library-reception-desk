@@ -134,7 +134,7 @@ export async function scan() {
   const detection = await detectSingleFace(video, canvas);
 
   const detectStats = getTimeStats('faceDetection', Date.now() - detectStart);
-  debug.detect = `${detectStats.time}ms ${detectStats.fps}fps`;
+  debug.detect = `${detectStats.time}ms ${detectStats.fps}hz`;
 
   let match = null;
   if (detection) {

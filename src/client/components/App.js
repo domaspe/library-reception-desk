@@ -1,16 +1,9 @@
 /* eslint-disable */
 import React from 'react';
-import {
-  SvgIcon,
-  Grid,
-  Paper,
-  CssBaseline,
-  Card,
-  Box
-} from '@material-ui/core';
+import { CssBaseline, Box } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import { connect } from 'react-redux';
-import { MemoryRouter, Router, Route, InitialRoute } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { AnimatedSwitch, spring } from 'react-router-transition';
 import { makeStyles } from '@material-ui/core/styles';
@@ -75,7 +68,7 @@ const App = ({ appInit }) => {
       <Test />
       <CssBaseline />
       {/* TODO: temp */}
-      {/* <HiddenCamera /> */}
+      <HiddenCamera />
       <ThemeProvider theme={theme}>
         <ItemsDrawer />
         <div className={classes.logButton}>

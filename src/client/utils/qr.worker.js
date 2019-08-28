@@ -7,7 +7,7 @@ self.addEventListener('message', event => {
   const start = Date.now();
   const code = jsQR(data, width, height);
   const qrStats = getTimeStats('faceDetection', Date.now() - start);
-  const debug = `${qrStats.time}ms ${qrStats.fps}fps`;
+  const debug = `${qrStats.time}ms ${qrStats.fps}hz`;
 
   self.postMessage({ debug, code });
 });
