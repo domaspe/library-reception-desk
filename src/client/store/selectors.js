@@ -14,7 +14,6 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  PATH_ITEM_LOG,
   MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
 } from '../constants';
 import { itemToString } from '../utils/item';
@@ -193,8 +192,8 @@ export function selectIsHelpPage(state) {
   return !!matchPath(selectPathname(state), { path: PATH_HELP });
 }
 
-export function selectIsLogPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_ITEM_LOG });
+export function selectIsItemsDrawerOpen(state) {
+  return state.itemsDrawer.open;
 }
 
 export function selectActiveUserId(state) {

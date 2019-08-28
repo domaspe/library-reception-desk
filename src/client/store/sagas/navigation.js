@@ -20,8 +20,8 @@ import {
   selectIsSessionPage,
   selectIsNotRecognizedPage,
   selectIsHelpPage,
-  selectIsLogPage,
-  selectActiveUserId
+  selectActiveUserId,
+  selectIsItemsDrawerOpen
 } from '../selectors';
 import {
   HIBERNATE_TIMEOUT,
@@ -30,8 +30,7 @@ import {
   PATH_SLEEP,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP,
-  PATH_ITEM_LOG
+  PATH_HELP
 } from '../../constants';
 import history from '../../utils/history';
 
@@ -118,10 +117,6 @@ function* help() {
   yield call(history.push, PATH_HELP);
 }
 
-function* itemLog() {
-  yield call(history.push, PATH_ITEM_LOG);
-}
-
 function* navigateToWelcomeOnEscape() {
   while (true) {
     const event = yield take(keydownChannel);
@@ -174,7 +169,7 @@ function* locationChange() {
     );
   }
 
-  if (yield select(selectIsLogPage)) {
+  if (yield select(selectIsItemsDrawerOpen)) {
     const userId = yield select(selectActiveUserId);
     yield call(
       waitForInactivity,
@@ -194,7 +189,6 @@ export default function* navigation() {
     yield takeLatest(actions.FACE_NOT_RECOGNIZED, faceNotRecognized),
     yield takeLatest(actions.CREATE_USER, createUser),
     yield takeLatest(actions.FACE_MATCH_SUCCESS, faceMatchSuccess),
-    yield takeLatest(actions.HELP, help),
-    yield takeLatest(actions.ITEM_LOG, itemLog)
+    yield takeLatest(actions.HELP, help)
   ]);
 }

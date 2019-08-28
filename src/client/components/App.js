@@ -31,14 +31,13 @@ import {
   PATH_SESSION,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP,
-  PATH_ITEM_LOG
+  PATH_HELP
 } from '../constants';
 import CreateUserPage from './pages/CreateUserPage';
 import { theme } from '../utils/theme';
 import Test from './common/Test';
-import ItemLog from './Pages/ItemLog';
-import LogButton from './common/LogButton';
+import ItemsDrawer from './common/ItemsDrawer';
+import ItemDrawerButton from './common/ItemDrawerButton';
 
 function mapStyles(styles) {
   return {
@@ -74,10 +73,12 @@ const App = ({ appInit }) => {
       {/* TODO: temp */}
       <Test />
       <CssBaseline />
-      <HiddenCamera />
+      {/* TODO: temp */}
+      {/* <HiddenCamera /> */}
       <ThemeProvider theme={theme}>
+        <ItemsDrawer />
         <div className={classes.logButton}>
-          <LogButton />
+          <ItemDrawerButton />
         </div>
         <Box
           display="flex"
@@ -101,7 +102,6 @@ const App = ({ appInit }) => {
               <Route path={PATH_NOT_RECOGNIZED} component={NotRecognizedPage} />
               <Route path={PATH_CREATE_USER} component={CreateUserPage} />
               <Route path={PATH_HELP} component={HelpPage} />
-              <Route exact path={PATH_ITEM_LOG} component={ItemLog} />
             </AnimatedSwitch>
           </ConnectedRouter>
         </Box>

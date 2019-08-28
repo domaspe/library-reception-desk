@@ -44,7 +44,7 @@ export const FACE_NOT_RECOGNIZED = 'FACE_NOT_RECOGNIZED';
 export const HIBERNATE = 'HIBERNATE';
 export const CREATE_USER = 'CREATE_USER';
 export const HELP = 'HELP';
-export const ITEM_LOG = 'ITEM_LOG';
+export const SET_ITEMS_DRAWER_STATE = 'SET_ITEMS_DRAWER_STATE';
 
 export const ERROR = 'ERROR';
 
@@ -279,9 +279,10 @@ export function help() {
   };
 }
 
-export function itemLog() {
+export function setItemsDrawerOpen(open) {
   return {
-    type: ITEM_LOG
+    type: SET_ITEMS_DRAWER_STATE,
+    open
   };
 }
 

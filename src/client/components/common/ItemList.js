@@ -54,11 +54,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ItemList = ({ onItemClick, items, showAdd }) => {
+const ItemList = ({ onItemClick, items, showAdd, height }) => {
   const classes = useStyles();
   return (
-    <Box className={classes.listContainer}>
-      <Box className={classes.list} style={{}}>
+    <Box className={classes.listContainer} style={{ height }}>
+      <Box className={classes.list} style={{ height }}>
         <Fade in={!items.length}>
           <Box p={2} style={{ position: 'absolute', width: '100%' }}>
             <Typography
@@ -145,7 +145,8 @@ const ItemList = ({ onItemClick, items, showAdd }) => {
 ItemList.propTypes = {
   onItemClick: PropTypes.func.isRequired,
   items: PropTypes.array.isRequired,
-  showAdd: PropTypes.bool
+  showAdd: PropTypes.bool,
+  height: PropTypes.any
 };
 
 export default ItemList;

@@ -5,7 +5,7 @@ import * as actions from '../../store/actions';
 
 const Test = ({ assign, faceMatch, detect }) => {
   return (
-    <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 999999 }}>
+    <div style={{ position: 'absolute', top: 0, right: 0 }}>
       <button
         onClick={() => {
           const code = prompt('code');
