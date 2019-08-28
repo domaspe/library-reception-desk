@@ -14,6 +14,7 @@ import { MemoryRouter, Router, Route, InitialRoute } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { AnimatedSwitch, spring } from 'react-router-transition';
 import { makeStyles } from '@material-ui/core/styles';
+import { hot } from 'react-hot-loader';
 
 import HiddenCamera from './HiddenCamera';
 import * as actions from '../store/actions';
@@ -113,4 +114,4 @@ const App = ({ appInit }) => {
 export default connect(
   null,
   { appInit: actions.appInit }
-)(App);
+)(hot(module)(App));
