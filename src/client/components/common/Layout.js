@@ -2,14 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
+import Icon from './Icon';
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    height: 60,
-    width: 60,
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
     margin: '0 auto',
     marginTop: theme.spacing(2)
   },
@@ -57,12 +53,13 @@ const Layout = ({
   return (
     <div className={classes.container}>
       {iconSrc && (
-        <div
+        <Icon
+          size={60}
+          src={iconSrc}
           className={classNames(classes.icon, 'animated', {
             bounce: animateIcon
           })}
           onAnimationEnd={onIconAnimationEnd}
-          style={{ backgroundImage: `url("${iconSrc}")` }}
         />
       )}
       {titleComponent && <div className={classes.box}>{titleComponent}</div>}

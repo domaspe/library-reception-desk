@@ -14,14 +14,29 @@ import { makeStyles } from '@material-ui/core/styles';
 import ItemList from './ItemList';
 import { selectItems, selectIsItemsDrawerOpen } from '../../store/selectors';
 import * as actions from '../../store/actions';
+import Icon from './Icon';
 
 const useStyles = makeStyles(theme => ({
+  icon: {
+    marginRight: theme.spacing(2)
+  },
   drawerHeader: {
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
     justifyContent: 'space-between'
+  },
+  drawerName: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  content: {
+    width: '70vw',
+    minWidth: 400,
+    maxWidth: '70vw'
   }
 }));
 
@@ -32,18 +47,19 @@ const ItemsDrawer = ({ open, items, setDrawerOpen, assignItem }) => {
   return (
     <Drawer open={open} onClose={handleClose}>
       <div className={classes.drawerHeader}>
-        <Box>
+        <div className={classes.drawerName}>
+          <Icon src="/assets/cart.svg" size={24} className={classes.icon} />
           <Typography variant="h6" color="textPrimary" align="center">
             All items
           </Typography>
-        </Box>
+        </div>
         <IconButton onClick={handleClose}>
           <ChevronLeftIcon />
         </IconButton>
       </div>
       <Divider />
 
-      <Box style={{ width: '70vw' }}>
+      <Box className={classes.content}>
         <ItemList
           items={items}
           onItemClick={handlRemoveItemClick}

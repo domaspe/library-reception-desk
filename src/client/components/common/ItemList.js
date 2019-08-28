@@ -58,7 +58,7 @@ const ItemList = ({ onItemClick, items, showAdd, height }) => {
   const classes = useStyles();
   return (
     <Box className={classes.listContainer} style={{ height }}>
-      <Box className={classes.list} style={{ height }}>
+      <Box className={classes.list} style={{ maxHeight: height }}>
         <Fade in={!items.length}>
           <Box p={2} style={{ position: 'absolute', width: '100%' }}>
             <Typography
