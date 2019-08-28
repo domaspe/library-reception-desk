@@ -15,7 +15,7 @@ import SwipeableViews from 'react-swipeable-views';
 import AddIcon from '@material-ui/icons/Add';
 import {
   selectActiveUserId,
-  selectNotifyAssignItemAuccess,
+  selectNotifyAssignItemSuccess,
   selectFreeItems,
   selectUserItems
 } from '../../store/selectors';
@@ -130,7 +130,7 @@ const SessionPage = ({
       >
         <>
           <div className={classes.tabText}>
-            <Typography color="textPrimary" gutterBottom>
+            <Typography color="textPrimary" align="center" gutterBottom>
               Below are the devices that you’ve taken out. If you want to
               take/return a device, face the QR code on the back of the device
               towards the camera.
@@ -173,7 +173,7 @@ const mapStateToProps = state => {
   const userId = selectActiveUserId(state);
   return {
     userId,
-    assignItemSuccess: selectNotifyAssignItemAuccess(state),
+    assignItemSuccess: selectNotifyAssignItemSuccess(state),
     freeItems: selectFreeItems(state, 'title'),
     userItems: selectUserItems(state, userId, 'dateTaken')
   };

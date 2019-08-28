@@ -11,8 +11,6 @@ export const UPDATE_CLASS_FAIL = 'UPDATE_CLASS_FAIL';
 export const QR_DETECT_SUCCESS = 'QR_DETECT_SUCCESS';
 export const QR_DETECT_FAIL = 'QR_DETECT_FAIL';
 
-export const SAVE_FACELESS = 'SAVE_FACELESS';
-
 export const SET_VIEW = 'SET_VIEW';
 export const OPEN_USER_PICKER = 'OPEN_USER_PICKER';
 export const CLOSE_USER_PICKER = 'CLOSE_USER_PICKER';
@@ -29,11 +27,7 @@ export const LOAD_USERS_SUCCESS = 'LOAD_USERS_SUCCESS';
 export const SET_ACTIVE_USER = 'SET_ACTIVE_USER';
 export const CLEAR_ACTIVE_USER = 'CLEAR_ACTIVE_USER';
 
-export const NOTIFY = 'NOTIFY';
-
 export const INITIALIZE_SCANNERS = 'INITIALIZE_SCANNERS';
-
-export const PICK_USER = 'PICK_USER';
 
 export const TRY_ASSIGN_ITEM = 'TRY_ASSIGN_ITEM';
 
@@ -72,13 +66,6 @@ export function saveFace(label, withFace) {
     type: SAVE_FACE_START,
     label,
     withFace
-  };
-}
-
-export function saveFaceless(user) {
-  return {
-    type: SAVE_FACELESS,
-    user
   };
 }
 
@@ -153,13 +140,6 @@ export function assignItemFail() {
   };
 }
 
-export function notify(message) {
-  return {
-    type: NOTIFY,
-    message
-  };
-}
-
 export function scanStart({ videoRef, faceCanvasRef, qrCanvasRef }) {
   return {
     type: INITIALIZE_SCANNERS,
@@ -192,13 +172,6 @@ export function loadUsersSuccess(users) {
   return {
     type: LOAD_USERS_SUCCESS,
     users
-  };
-}
-
-export function pickUser(user) {
-  return {
-    type: PICK_USER,
-    user
   };
 }
 

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Typography,
-  IconButton,
-  Paper,
-  Grid,
-  Box,
-  Fade
-} from '@material-ui/core';
+import { Typography, IconButton, Paper, Box, Fade } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,12 +10,12 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 const useStyles = makeStyles(theme => ({
   listContainer: {
-    height: '50vh',
+    height: '60vh',
     width: '100%',
     display: 'flex'
   },
   list: {
-    maxHeight: '50vh',
+    maxHeight: '60vh',
     width: '100%',
     overflowY: 'auto',
     overflowX: 'hidden'

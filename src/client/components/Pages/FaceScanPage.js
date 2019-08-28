@@ -3,7 +3,7 @@ import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Layout from '../common/Layout';
-import { selectNotifyAssignItemAuccess } from '../../store/selectors';
+import { selectNotifyAssignItemSuccess } from '../../store/selectors';
 import { useIconAnimation } from '../../utils/hooks';
 import HelpButton from '../common/HelpButton';
 import ChooseUserButton from '../common/ChooseUserButton';
@@ -35,7 +35,7 @@ FaceScanPage.propTypes = {
 };
 
 const mapSateToProps = state => ({
-  assignItemSuccess: selectNotifyAssignItemAuccess(state)
+  assignItemSuccess: selectNotifyAssignItemSuccess(state)
 });
 
 export default connect(mapSateToProps)(FaceScanPage);
