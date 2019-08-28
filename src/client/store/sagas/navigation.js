@@ -19,9 +19,7 @@ import {
   selectIsFaceScanPage,
   selectIsSessionPage,
   selectIsNotRecognizedPage,
-  selectIsHelpPage,
-  selectActiveUserId,
-  selectIsItemsDrawerOpen
+  selectIsHelpPage
 } from '../selectors';
 import {
   HIBERNATE_TIMEOUT,
@@ -48,6 +46,13 @@ const mousemoveChannel = eventChannel(emitter => {
   };
 });
 
+const wheelChannel = eventChannel(emitter => {
+  document.addEventListener('wheel', emitter);
+  return () => {
+    document.removeEventListener('wheel', emitter);
+  };
+});
+
 const clickChannel = eventChannel(emitter => {
   document.addEventListener('click', emitter);
   return () => {
@@ -68,6 +73,7 @@ function* waitForInactivity(timeout, action) {
       take('*'),
       take(keydownChannel),
       take(mousemoveChannel),
+      take(wheelChannel),
       take(clickChannel)
     ]);
 
@@ -132,6 +138,7 @@ function* locationChange() {
     yield race([
       take(keydownChannel),
       take(mousemoveChannel),
+      take(wheelChannel),
       take(clickChannel)
     ]);
     yield put(actions.startScanningFaces());
@@ -168,20 +175,11 @@ function* locationChange() {
       actions.startScanningFaces()
     );
   }
-
-  if (yield select(selectIsItemsDrawerOpen)) {
-    const userId = yield select(selectActiveUserId);
-    yield call(
-      waitForInactivity,
-      HIBERNATE_TIMEOUT,
-      userId ? actions.startSession(userId) : actions.startScanningFaces()
-    );
-  }
 }
 
 export default function* navigation() {
   yield all([
-    yield takeLatest(LOCATION_CHANGE, locationChange),
+    // yield takeLatest(LOCATION_CHANGE, locationChange),
     yield takeLatest(actions.START_SESSION, startSession),
     yield takeLatest(actions.END_SESSION, endSession),
     yield takeLatest(actions.HIBERNATE, hibernate),

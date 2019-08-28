@@ -49,8 +49,21 @@ const useStyles = makeStyles(theme => ({
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     backgroundOrigin: 'content-box',
-    backgroundPosition: 'center',
-    paddingRight: theme.spacing(2)
+    backgroundPosition: 'center'
+  },
+  itemContent: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%'
+  },
+  thumbnailContainer: {
+    width: 90,
+    height: '100%'
+  },
+  descriptionContainer: {
+    flex: 1
   }
 }));
 
@@ -80,16 +93,16 @@ const ItemList = ({ onItemClick, items, showAdd, height }) => {
                   className={classes.item}
                   title={`${item.primaryTitle}\nBy ${item.secondaryTitle}`}
                 >
-                  <Grid container>
-                    <Grid item xs={2}>
+                  <div className={classes.itemContent}>
+                    <div className={classes.thumbnailContainer}>
                       <Box
                         className={classes.thumbnail}
                         style={{
                           backgroundImage: `url("/data/thumbnails/${item.thumbnail}")`
                         }}
                       />
-                    </Grid>
-                    <Grid item xs={10}>
+                    </div>
+                    <div className={classes.descriptionContainer}>
                       <Box className={classes.description}>
                         <Typography className={classes.primaryTitle} noWrap>
                           {item.primaryTitle}
@@ -114,8 +127,8 @@ const ItemList = ({ onItemClick, items, showAdd, height }) => {
                           </>
                         )}
                       </Box>
-                    </Grid>
-                  </Grid>
+                    </div>
+                  </div>
                   {showAdd && (
                     <IconButton
                       color="primary"
