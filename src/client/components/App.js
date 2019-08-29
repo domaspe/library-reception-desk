@@ -64,10 +64,8 @@ const App = ({ appInit }) => {
 
   return (
     <React.Fragment>
-      {/* TODO: temp */}
-      <Test />
+      {/* <Test /> */}
       <CssBaseline />
-      {/* TODO: temp */}
       <HiddenCamera />
       <ThemeProvider theme={theme}>
         <ItemsDrawer />

@@ -4,10 +4,10 @@ body {
 
 .smart-camera-container {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  /* top: -9999px;
-  left: -9999px; */
+  /* bottom: 0;
+  left: 0; */
+  top: -9999px;
+  left: -9999px;
   /* opacity: 0.5; */
   transform-origin: bottom center;
   transform: scale(-0.2, 0.2);

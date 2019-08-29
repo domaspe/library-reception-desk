@@ -11,6 +11,7 @@ import {
   cancel
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
+import moment from 'moment';
 
 import * as actions from '../actions';
 import { waitFor } from '../../utils/sagas';
@@ -27,6 +28,7 @@ import {
   selectIsCreateUserPage,
   selectIsReadingFace
 } from '../selectors';
+
 import * as face from '../../utils/face';
 import * as qr from '../../utils/qr';
 import {
@@ -47,6 +49,7 @@ import {
   __displayQrTimeStats
 } from '../../utils/displayTimeStats';
 
+const moduleCreateTime = moment();
 const animationFrame = () =>
   new Promise(resolve => requestAnimationFrame(resolve));
 
@@ -68,24 +71,31 @@ function* performFaceScan() {
     }
     callNextDetectionFail = true;
   } else if (callNextDetectionFail || isReadingFace) {
-    // dispatch only one consecutive fail action
-    // unless we are reading face for new user, then always dispatch fail
+    // Dispatch only one consecutive fail action unless we are reading face for new user, then always dispatch fail
     yield put(actions.faceDetectFail());
     callNextDetectionFail = false;
   }
 
-  if (!isReadingFace) {
-    if (isFaceMatched) {
+  if (!isReadingFace && isFaceMatched) {
+    // Check if we are still in face scan page.
+    // This prevents race condition, when user clicks on some other page, but we still redirect him to session
+    if (yield select(selectIsFaceScanPage)) {
       yield put(actions.faceMatchSuccess(result.match.label));
-    } else if (isFaceDetected) {
-      yield put(actions.faceMatchFail());
     }
+  }
 
+  if (!isReadingFace && !isFaceMatched && isFaceDetected) {
+    yield put(actions.faceMatchFail());
+  }
+
+  if (!isReadingFace) {
     const faceCannotBeMatched = yield select(selectFaceCannotBeMatched);
     if (faceCannotBeMatched) {
       yield put(actions.faceNotRecognized());
     }
-  } else {
+  }
+
+  if (isReadingFace) {
     const faceMissingForHistory = yield select(selectFaceMissingForHistory);
     if (faceMissingForHistory) {
       yield put(actions.updateClassFail());
@@ -119,6 +129,11 @@ function* scanFaceWorker() {
         : FACE_QUICK_SCAN_INTERVAL;
       lastState = PATH_FACE_SCAN;
     } else if (yield select(selectIsHibernatedPage)) {
+      if (moment().diff(moduleCreateTime, 'hours') > 1) {
+        // eslint-disable-next-line no-restricted-globals
+        location.reload();
+      }
+
       cancelCurrentScan = false;
       delayNextIteration = FACE_SLOW_SCAN_INTERVAL;
     }

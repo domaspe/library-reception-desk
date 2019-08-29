@@ -134,7 +134,7 @@ function* help() {
   yield call(history.push, PATH_HELP);
 }
 
-function* navigateToWelcomeOnEscape() {
+function* endSessionOnEscape() {
   while (true) {
     const event = yield take(keydownChannel);
     if (event.key === 'Escape') {
@@ -172,9 +172,9 @@ function* locationChange() {
 
   if (yield select(selectIsSessionPage)) {
     yield race([
-      yield call(waitForInactivity, HIBERNATE_TIMEOUT, actions.endSession()),
-      yield call(navigateToWelcomeOnEscape),
-      yield take(actions.END_SESSION)
+      call(waitForInactivity, HIBERNATE_TIMEOUT, actions.endSession()),
+      call(endSessionOnEscape),
+      take(actions.END_SESSION)
     ]);
     return;
   }
