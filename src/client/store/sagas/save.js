@@ -19,6 +19,7 @@ import {
 } from '../selectors';
 import fetch from '../../utils/fetch';
 import { mapFloat32ArrayToArr } from '../../utils/float32Array';
+import { mapResponseToClass } from '../../utils/classUtils';
 
 const assignFx = new UIfx(assignAudio, {
   volume: 0.4, // number between 0.0 ~ 1.0
@@ -47,7 +48,7 @@ function* saveFace({ label, withFace }) {
 
   yield call(fetch, '/api/users', 'POST', { id: label });
   yield put(actions.loadUsers());
-  yield put(actions.startScanningFaces());
+  yield put(actions.loadClasses());
 }
 
 function* updateClass({ label, descriptors }) {
@@ -58,9 +59,9 @@ function* updateClass({ label, descriptors }) {
       label,
       descriptors: descriptors.map(mapFloat32ArrayToArr)
     });
-    yield put(actions.updateClassSuccess());
     yield put(actions.loadUsers());
-    yield put(actions.startScanningFaces());
+    yield put(actions.updateClassSuccess());
+    yield put(actions.loadClasses());
   } catch (err) {
     yield put(actions.updateClassFail());
   }
@@ -101,6 +102,12 @@ function* tryAssignItem({ itemId, userId }) {
   yield put(actions.assignItemFail());
 }
 
+function* loadClasses() {
+  const classesResponse = yield call(fetch, '/api/classes');
+  const classes = classesResponse.map(mapResponseToClass);
+  yield put(actions.loadClassesSuccess(classes));
+}
+
 export default function* other() {
   yield all([
     yield takeLatest(actions.SAVE_FACE_START, saveFace),
@@ -108,6 +115,7 @@ export default function* other() {
     yield takeLeading(actions.TRY_ASSIGN_ITEM, tryAssignItem),
     yield takeLatest(actions.APP_INIT, appInit),
     yield takeLatest(actions.LOAD_ITEMS, loadItems),
-    yield takeLatest(actions.LOAD_USERS, loadUsers)
+    yield takeLatest(actions.LOAD_USERS, loadUsers),
+    yield takeLatest(actions.LOAD_CLASSES, loadClasses)
   ]);
 }

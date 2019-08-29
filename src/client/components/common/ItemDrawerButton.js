@@ -5,7 +5,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as actions from '../../store/actions';
-import { selectIsItemsDrawerOpen } from '../../store/selectors';
+import {
+  selectIsItemsDrawerOpen,
+  selectIsHibernatedPage
+} from '../../store/selectors';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -34,7 +37,7 @@ ItemDrawerButton.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    show: !selectIsItemsDrawerOpen(state)
+    show: !selectIsItemsDrawerOpen(state) && !selectIsHibernatedPage(state)
   };
 };
 

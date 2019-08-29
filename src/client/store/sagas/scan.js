@@ -7,7 +7,8 @@ import {
   race,
   delay,
   fork,
-  take
+  take,
+  cancel
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 
@@ -16,23 +17,30 @@ import { waitFor } from '../../utils/sagas';
 import {
   selectIsFaceDetected,
   selectQrCode,
-  selectIsSavingFace,
   selectIsFaceScanPage,
   selectIsSessionPage,
   selectFaceCannotBeMatched,
   selectIsHibernatedPage,
   selectFaceMissingForHistory,
-  selectActiveUserId
+  selectActiveUserId,
+  selectIsHelpPage,
+  selectIsCreateUserPage,
+  selectIsReadingFace
 } from '../selectors';
-import fetch from '../../utils/fetch';
 import * as face from '../../utils/face';
 import * as qr from '../../utils/qr';
 import {
   FACE_SLOW_SCAN_INTERVAL,
   TIMEOUT_AFTER_ASSIGN,
-  FACE_QUICK_SCAN_INTERVAL
+  FACE_QUICK_SCAN_INTERVAL,
+  FACE_SCAN_TASK_INTERVAL,
+  PATH_CREATE_USER,
+  PATH_SESSION,
+  FACE_DELAY_BEFORE_SCAN_INTERVAL,
+  PATH_FACE_SCAN,
+  FACE_READ_FACE_SCAN_INTERVAL,
+  PATH_HELP
 } from '../../constants';
-import { mapResponseToClass } from '../../utils/classUtils';
 import QrWorker from '../../utils/qr.worker';
 import {
   __displayFaceTimeStats,
@@ -42,37 +50,31 @@ import {
 const animationFrame = () =>
   new Promise(resolve => requestAnimationFrame(resolve));
 
-let faceScanPaused = false;
-const FACE_SCAN_UNPAUSED = 'sagas/scan/FACE_SCAN_UNPAUSED';
+let callNextDetectionFail = false;
+function* performFaceScan() {
+  const isReadingFace = yield select(selectIsReadingFace);
+  const isFaceDetectionNotified = yield select(selectIsFaceDetected);
+  const result = yield call(face.scan);
 
-function* scanFaceWorker() {
-  let callNextDetectionFail = false;
-  while (true) {
-    if (faceScanPaused) {
-      yield take(FACE_SCAN_UNPAUSED);
+  __displayFaceTimeStats(result && result.debug);
+
+  const isFaceDetected = result && result.detection;
+  const isFaceMatched = result && result.match;
+
+  if (isFaceDetected) {
+    const shouldNotifyDetection = isReadingFace || !isFaceDetectionNotified;
+    if (shouldNotifyDetection) {
+      yield put(actions.faceDetectSuccess(result.detection.descriptor));
     }
+    callNextDetectionFail = true;
+  } else if (callNextDetectionFail || isReadingFace) {
+    // dispatch only one consecutive fail action
+    // unless we are reading face for new user, then always dispatch fail
+    yield put(actions.faceDetectFail());
+    callNextDetectionFail = false;
+  }
 
-    const isSavingFace = yield select(selectIsSavingFace);
-    const isFaceDetectionNotified = yield select(selectIsFaceDetected);
-    const result = yield call(face.scan);
-
-    __displayFaceTimeStats(result && result.debug);
-
-    const isFaceDetected = result && result.detection;
-    const isFaceMatched = result && result.match;
-
-    if (isFaceDetected) {
-      const shouldNotifyDetection = isSavingFace || !isFaceDetectionNotified;
-      if (shouldNotifyDetection) {
-        yield put(actions.faceDetectSuccess(result.detection.descriptor));
-      }
-      callNextDetectionFail = true;
-    } else if (callNextDetectionFail) {
-      // dispatch only one consecutive fail action
-      yield put(actions.faceDetectFail());
-      callNextDetectionFail = false;
-    }
-
+  if (!isReadingFace) {
     if (isFaceMatched) {
       yield put(actions.faceMatchSuccess(result.match.label));
     } else if (isFaceDetected) {
@@ -80,27 +82,55 @@ function* scanFaceWorker() {
     }
 
     const faceCannotBeMatched = yield select(selectFaceCannotBeMatched);
-    if (!isSavingFace && faceCannotBeMatched) {
+    if (faceCannotBeMatched) {
       yield put(actions.faceNotRecognized());
     }
-
+  } else {
     const faceMissingForHistory = yield select(selectFaceMissingForHistory);
-    if (isSavingFace && faceMissingForHistory) {
+    if (faceMissingForHistory) {
       yield put(actions.updateClassFail());
     }
+  }
+}
 
-    if (!faceScanPaused) {
-      if (yield select(selectIsFaceScanPage)) {
-        yield delay(FACE_QUICK_SCAN_INTERVAL);
-      } else if (yield select(selectIsHibernatedPage)) {
-        yield race([
-          delay(FACE_SLOW_SCAN_INTERVAL),
-          call(waitFor, selectIsFaceScanPage)
-        ]);
-      } else {
-        yield delay(FACE_SLOW_SCAN_INTERVAL);
+function* scanFaceWorker() {
+  let task = null;
+  let lastState = '';
+  let delayNextIteration = 0;
+  let cancelCurrentScan = true;
+  while (true) {
+    delayNextIteration = 0;
+    cancelCurrentScan = true;
+
+    if (yield select(selectIsCreateUserPage)) {
+      if (yield select(selectIsReadingFace)) {
+        delayNextIteration = FACE_READ_FACE_SCAN_INTERVAL;
+        cancelCurrentScan = false;
       }
+      lastState = PATH_CREATE_USER;
+    } else if (yield select(selectIsSessionPage)) {
+      lastState = PATH_SESSION;
+    } else if (yield select(selectIsHelpPage)) {
+      lastState = PATH_HELP;
+    } else if (yield select(selectIsFaceScanPage)) {
+      cancelCurrentScan = lastState !== PATH_FACE_SCAN;
+      delayNextIteration = cancelCurrentScan
+        ? FACE_DELAY_BEFORE_SCAN_INTERVAL
+        : FACE_QUICK_SCAN_INTERVAL;
+      lastState = PATH_FACE_SCAN;
+    } else if (yield select(selectIsHibernatedPage)) {
+      cancelCurrentScan = false;
+      delayNextIteration = FACE_SLOW_SCAN_INTERVAL;
     }
+
+    if (cancelCurrentScan) {
+      if (task && task.isRunning()) {
+        yield cancel(task);
+      }
+    } else if (!task || !task.isRunning()) {
+      task = yield fork(performFaceScan);
+    }
+    yield delay(delayNextIteration || FACE_SCAN_TASK_INTERVAL);
   }
 }
 
@@ -153,47 +183,17 @@ function* scanQrWorker() {
   }
 }
 
-function* faceScanRegulatorWorker() {
-  while (true) {
-    const [faceIsMatched, faceIsNotRecognized, navigatedToHelp] = yield race([
-      take(actions.FACE_MATCH_SUCCESS),
-      take(actions.FACE_NOT_RECOGNIZED),
-      take(actions.HELP)
-    ]);
-
-    if (faceIsMatched) {
-      faceScanPaused = true;
-      yield take(actions.START_SCANNING_FACES);
-      yield delay(FACE_SLOW_SCAN_INTERVAL * 3); // Also wait some time, so the same person is not logged in
-    }
-
-    if (faceIsNotRecognized) {
-      faceScanPaused = true;
-      yield race([
-        take(actions.START_SCANNING_FACES),
-        take(actions.SAVE_FACE_START)
-      ]); // pause on not-recognised phase
-      yield delay(FACE_SLOW_SCAN_INTERVAL);
-    }
-
-    if (navigatedToHelp) {
-      faceScanPaused = true;
-      yield take(actions.START_SCANNING_FACES);
-      yield delay(FACE_SLOW_SCAN_INTERVAL);
-    }
-
-    faceScanPaused = false;
-    yield put({ type: FACE_SCAN_UNPAUSED });
-  }
+function* createFaceMatcher({ classes }) {
+  yield call(face.createFaceMatcher, classes);
 }
 
 function* startScan(action) {
   if (!face.isFaceDetectionModelLoaded()) {
     yield call(face.loadModels);
   }
-  const classesResponse = yield call(fetch, '/api/classes');
-  const classes = classesResponse.map(mapResponseToClass);
-  yield call(face.createFaceMatcher, classes);
+
+  yield put(actions.loadClasses());
+  yield take(actions.LOAD_CLASSES_SUCCESS);
 
   if (action.type === actions.INITIALIZE_SCANNERS) {
     face.setMedia(action.videoRef.current, action.faceCanvasRef.current);
@@ -202,9 +202,11 @@ function* startScan(action) {
 
   yield fork(scanFaceWorker);
   yield fork(scanQrWorker);
-  yield fork(faceScanRegulatorWorker);
 }
 
 export default function* sagas() {
-  yield all([yield takeLatest(actions.INITIALIZE_SCANNERS, startScan)]);
+  yield all([
+    yield takeLatest(actions.INITIALIZE_SCANNERS, startScan),
+    yield takeLatest(actions.LOAD_CLASSES_SUCCESS, createFaceMatcher)
+  ]);
 }

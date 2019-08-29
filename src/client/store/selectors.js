@@ -14,7 +14,8 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
+  MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS,
+  MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
 } from '../constants';
 
 const selectFaceState = state => state.face;
@@ -32,15 +33,16 @@ export function selectIsFaceHistoryReady(state) {
   );
 }
 
-export function selectIsSavingFace(state) {
-  return (
-    selectFaceHistoryState(state).status === SAVE_FACE_START ||
-    selectFaceHistoryState(state).status === UPDATE_CLASS
-  );
+export function selectIsReadingFace(state) {
+  return selectFaceHistoryState(state).status === SAVE_FACE_START;
 }
 
 export function selectIsUpdatingClass(state) {
   return selectFaceHistoryState(state).status === UPDATE_CLASS;
+}
+
+export function selectIsSavingFace(state) {
+  return selectIsReadingFace(state) || selectIsUpdatingClass(state);
 }
 
 export function selectIsLoadingUsers(state) {
@@ -73,7 +75,7 @@ export function selectFaceCannotBeMatched(state) {
 export function selectFaceMissingForHistory(state) {
   return (
     selectFaceHistoryState(state).consecutiveFails >
-    MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
+    MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
   );
 }
 

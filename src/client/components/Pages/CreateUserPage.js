@@ -131,7 +131,7 @@ const CreateUserPage = ({
                 Close
               </Button>
             )}
-            {step > 0 && (
+            {step === 1 && (
               <Button
                 variant="contained"
                 color="primary"
@@ -143,15 +143,17 @@ const CreateUserPage = ({
                 Back
               </Button>
             )}
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              className={classes.button}
-            >
-              Next
-              <NavigateNextIcon className={classes.rightIcon} />
-            </Button>
+            {step < 2 && (
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                className={classes.button}
+              >
+                Next
+                <NavigateNextIcon className={classes.rightIcon} />
+              </Button>
+            )}
           </>
         }
       >
@@ -261,7 +263,7 @@ CreateUserPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  progress: selectors.selectFaceDataCollectedPercentage(state) * 0.8,
+  progress: selectors.selectFaceDataCollectedPercentage(state) * 0.8 || 0.2,
   users: selectors.selectUsers(state),
   isSendingData:
     selectors.selectIsUpdatingClass(state) ||

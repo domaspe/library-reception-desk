@@ -41,6 +41,7 @@ export default function face(state = initialState, action) {
     case UPDATE_CLASS_FAIL:
       return {
         ...state,
+        consecutiveFails: 0,
         status: action.type,
         descriptors: []
       };

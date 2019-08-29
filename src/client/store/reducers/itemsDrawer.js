@@ -1,8 +1,7 @@
 import {
   SET_ITEMS_DRAWER_STATE,
   HIBERNATE,
-  START_SCANNING_FACES,
-  START_SESSION
+  START_SCANNING_FACES
 } from '../actions';
 
 const initialState = {

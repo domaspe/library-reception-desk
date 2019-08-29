@@ -10,6 +10,8 @@ export const UPDATE_CLASS_SUCCESS = 'UPDATE_CLASS_SUCCESS';
 export const UPDATE_CLASS_FAIL = 'UPDATE_CLASS_FAIL';
 export const QR_DETECT_SUCCESS = 'QR_DETECT_SUCCESS';
 export const QR_DETECT_FAIL = 'QR_DETECT_FAIL';
+export const LOAD_CLASSES = 'LOAD_CLASSES';
+export const LOAD_CLASSES_SUCCESS = 'LOAD_CLASSES_SUCCESS';
 
 export const SET_VIEW = 'SET_VIEW';
 export const OPEN_USER_PICKER = 'OPEN_USER_PICKER';
@@ -146,6 +148,19 @@ export function scanStart({ videoRef, faceCanvasRef, qrCanvasRef }) {
     videoRef,
     faceCanvasRef,
     qrCanvasRef
+  };
+}
+
+export function loadClasses() {
+  return {
+    type: LOAD_CLASSES
+  };
+}
+
+export function loadClassesSuccess(classes) {
+  return {
+    type: LOAD_CLASSES_SUCCESS,
+    classes
   };
 }
 

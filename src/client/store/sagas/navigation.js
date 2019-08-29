@@ -35,7 +35,7 @@ import history from '../../utils/history';
 import loginAudio from '../../../../assets/login.mp3';
 
 const loginFx = new UIfx(loginAudio, {
-  volume: 0.4, // number between 0.0 ~ 1.0
+  volume: 0.3, // number between 0.0 ~ 1.0
   throttleMs: 100
 });
 
@@ -195,7 +195,9 @@ export default function* navigation() {
     yield takeLatest(actions.END_SESSION, endSession),
     yield takeLatest(actions.HIBERNATE, hibernate),
     yield takeLatest(actions.START_SCANNING_FACES, startScanningFaces),
+    yield takeLatest(actions.LOAD_CLASSES_SUCCESS, startScanningFaces),
     yield takeLatest(actions.FACE_NOT_RECOGNIZED, faceNotRecognized),
+    yield takeLatest(actions.UPDATE_CLASS_FAIL, faceNotRecognized),
     yield takeLatest(actions.CREATE_USER, createUser),
     yield takeLatest(actions.FACE_MATCH_SUCCESS, faceMatchSuccess),
     yield takeLatest(actions.HELP, help)
