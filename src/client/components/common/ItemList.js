@@ -52,11 +52,13 @@ const useStyles = makeStyles(theme => ({
     height: '100%'
   },
   thumbnailContainer: {
-    width: 90,
+    width: 60,
     height: '100%'
   },
   descriptionContainer: {
-    flex: 1
+    width: 0, // makes noWrap work for some reason o_O
+    flex: 1,
+    marginLeft: theme.spacing(2)
   }
 }));
 
@@ -91,53 +93,43 @@ const ItemList = ({ onItemClick, items, showAdd, height }) => {
                       <Box
                         className={classes.thumbnail}
                         style={{
-                          backgroundImage: `url("/data/thumbnails/${item.thumbnail}")`
+                          backgroundImage: `url("${item.thumbnailUrl}")`
                         }}
                       />
                     </div>
                     <div className={classes.descriptionContainer}>
-                      <Box className={classes.description}>
-                        <Typography className={classes.primaryTitle} noWrap>
-                          {item.primaryTitle}
+                      <Typography className={classes.primaryTitle} noWrap>
+                        {item.primaryTitle}
+                      </Typography>
+                      <Typography className={classes.secondaryTitle} noWrap>
+                        {item.secondaryTitle}
+                      </Typography>
+                      {!!item.user && (
+                        <Typography variant="caption" noWrap>
+                          {'Taken '}
+                          {moment(item.timeTaken).format('MMM Do, hh:mm')}
+                          {' by '}
+                          <span className={classes.user}>{item.user.name}</span>
                         </Typography>
-                        <Typography className={classes.secondaryTitle} noWrap>
-                          {item.secondaryTitle}
-                        </Typography>
-                        {!!item.dateTaken && (
-                          <>
-                            <Typography variant="caption">
-                              Taken&nbsp;
-                              {moment(item.dateTaken).format('MMM Do, hh:mm')}
-                              &nbsp;by
-                            </Typography>
-                            &nbsp;
-                            <Typography
-                              variant="caption"
-                              className={classes.user}
-                            >
-                              {item.user}
-                            </Typography>
-                          </>
-                        )}
-                      </Box>
+                      )}
                     </div>
+                    {showAdd && (
+                      <IconButton
+                        color="primary"
+                        onClick={() => onItemClick(item.id)}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    )}
+                    {!showAdd && !!item.timeTaken && (
+                      <IconButton
+                        color="primary"
+                        onClick={() => onItemClick(item.id)}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    )}
                   </div>
-                  {showAdd && (
-                    <IconButton
-                      color="primary"
-                      onClick={() => onItemClick(item.id)}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  )}
-                  {!showAdd && !!item.dateTaken && (
-                    <IconButton
-                      color="primary"
-                      onClick={() => onItemClick(item.id)}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  )}
                 </Paper>
               </CSSTransition>
             );

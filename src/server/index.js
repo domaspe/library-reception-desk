@@ -32,12 +32,6 @@ app.get('/api/test', (req, res) => {
 app.get('/api/users', (req, res, next) => {
   return handlers
     .getUsers()
-    .then(users =>
-      users.map(user => ({
-        ...user,
-        descriptors: JSON.parse(user.descriptors)
-      }))
-    )
     .then(users => res.json(users))
     .catch(next);
 });
@@ -52,7 +46,7 @@ app.get('/api/items', (req, res, next) => {
 app.post('/api/users', (req, res, next) => {
   const { id, name, descriptors } = req.body;
   return handlers
-    .addOrUpdateUser(Number(id), name, JSON.stringify(descriptors))
+    .addOrUpdateUser(Number(id), name, descriptors)
     .then(() => res.sendStatus(200))
     .catch(next);
 });

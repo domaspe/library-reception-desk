@@ -108,15 +108,19 @@ function getUser(id) {
   return get('SELECT * FROM users WHERE id = ?', [id]);
 }
 
-function updateUser(id, data) {
-  return getUser(id).then(item => {
-    const updated = { ...item, ...data };
-    return run('UPDATE users SET name = ?, descriptors = ? WHERE id = ?', [
-      updated.name,
-      updated.descriptors,
-      id
-    ]);
-  });
+function getUserByName(name) {
+  return get('SELECT * FROM users WHERE name = ? LIMIT 1', [name]);
+}
+
+async function updateUser(id, data) {
+  console.log('>>> id', id);
+  const user = await getUser(id);
+  const updated = { ...user, ...data };
+  return run('UPDATE users SET name = ?, descriptors = ? WHERE id = ?', [
+    updated.name,
+    updated.descriptors,
+    id
+  ]);
 }
 
 function addUser(name, descriptors) {
@@ -127,7 +131,7 @@ function addUser(name, descriptors) {
 }
 
 function getItems() {
-  return all('SELECT * FROM items');
+  return all('SELECT * FROM items').then(items => items.slice(0, 10));
 }
 
 function getItem(id) {
@@ -155,6 +159,7 @@ function updateItem(id, data) {
 module.exports = {
   getUsers,
   getUser,
+  getUserByName,
   updateUser,
   addUser,
   getItems,

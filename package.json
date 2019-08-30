@@ -38,6 +38,8 @@
     "react-swipeable-views": "^0.13.3",
     "redux": "^4.0.4",
     "redux-saga": "^1.0.5",
+    "reselect": "^4.0.0",
+    "shallowequal": "^1.1.0",
     "sqlite3": "^4.1.0",
     "uifx": "^2.0.3"
   },

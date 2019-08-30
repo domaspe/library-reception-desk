@@ -1,10 +1,10 @@
 import { matchPath } from 'react-router-dom';
 import {
   SAVE_FACE_START,
-  UPDATE_CLASS,
   FACE_DETECT_SUCCESS,
   LOAD_USERS,
-  ASSIGN_ITEM_SUCCESS
+  ASSIGN_ITEM_SUCCESS,
+  UPDATE_USER
 } from './actions';
 import {
   DESCRIPTORS_PER_CLASS,
@@ -37,12 +37,12 @@ export function selectIsReadingFace(state) {
   return selectFaceHistoryState(state).status === SAVE_FACE_START;
 }
 
-export function selectIsUpdatingClass(state) {
-  return selectFaceHistoryState(state).status === UPDATE_CLASS;
+export function selectIsUpdatingUser(state) {
+  return selectFaceHistoryState(state).status === UPDATE_USER;
 }
 
 export function selectIsSavingFace(state) {
-  return selectIsReadingFace(state) || selectIsUpdatingClass(state);
+  return selectIsReadingFace(state) || selectIsUpdatingUser(state);
 }
 
 export function selectIsLoadingUsers(state) {
@@ -83,14 +83,21 @@ export function selectQrCode(state) {
   return selectQrState(state).code;
 }
 
-export function selectItems(state, sortBy = 'dateTaken') {
+export function selectUsers(state) {
+  return selectUsersState(state).users;
+}
+
+export function selectItems(state, sortBy = 'timeTaken') {
   const { items } = selectItemsState(state);
-  if (sortBy === 'dateTaken') {
-    return items.sort((a, b) => new Date(b.dateTaken) - new Date(a.dateTaken));
+  let sorted = items;
+  if (sortBy === 'timeTaken') {
+    sorted = items.sort(
+      (a, b) => new Date(b.timeTaken) - new Date(a.timeTaken)
+    );
   }
 
   if (sortBy === 'title') {
-    return items.sort((a, b) => {
+    sorted = items.sort((a, b) => {
       if (a.primaryTitle > b.primaryTitle) return 1;
       if (a.primaryTitle < b.primaryTitle) return -1;
       if (a.secondaryTitle > b.secondaryTitle) return 1;
@@ -99,11 +106,24 @@ export function selectItems(state, sortBy = 'dateTaken') {
     });
   }
 
-  return items;
+  const users = selectUsers(state);
+  return sorted.map(item => ({
+    ...item,
+    user: users.find(user => user.id === item.takenByUserId) || null
+  }));
 }
 
-export function selectUsers(state) {
-  return selectUsersState(state).users;
+export function selectClassesLoaded(state) {
+  return selectUsers(state).length > 0;
+}
+
+export function selectClasses(state) {
+  return selectUsers(state)
+    .filter(user => user.descriptors)
+    .map(user => ({
+      label: user.id.toString(),
+      descriptors: user.descriptors
+    }));
 }
 
 export function selectNotifyAssignItemSuccess(state) {
@@ -116,7 +136,7 @@ export function selectNotifyAssignItemSuccess(state) {
 
 export function selectUserItems(state, user, sortBy) {
   return selectItems(state, sortBy).filter(
-    item => String(item.user) === String(user)
+    item => String(item.takenByUserId) === String(user)
   );
 }
 
@@ -125,7 +145,7 @@ export function selectUserHasItem(state, user, itemId) {
 }
 
 export function selectFreeItems(state, sortBy) {
-  return selectItems(state, sortBy).filter(item => !item.dateTaken);
+  return selectItems(state, sortBy).filter(item => !item.timeTaken);
 }
 
 function selectPathname(state) {
@@ -164,4 +184,9 @@ export function selectIsItemsDrawerOpen(state) {
 
 export function selectActiveUserId(state) {
   return selectActiveUserState(state).id;
+}
+
+export function selectActiveUser(state) {
+  const userId = selectActiveUserId(state);
+  return selectUsers(state).find(user => user.id === userId);
 }

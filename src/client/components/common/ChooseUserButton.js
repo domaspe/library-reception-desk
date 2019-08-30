@@ -52,7 +52,7 @@ const ChooseUserButton = ({ users, onUserPick }) => {
       >
         {users.map(user => (
           <MenuItem key={user.id} onClick={getUserClickHandler(user.id)}>
-            {user.id}
+            {user.name}
           </MenuItem>
         ))}
       </Menu>

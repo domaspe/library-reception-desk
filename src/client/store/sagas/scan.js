@@ -26,7 +26,8 @@ import {
   selectActiveUserId,
   selectIsHelpPage,
   selectIsCreateUserPage,
-  selectIsReadingFace
+  selectIsReadingFace,
+  selectClasses
 } from '../selectors';
 
 import * as face from '../../utils/face';
@@ -198,7 +199,8 @@ function* scanQrWorker() {
   }
 }
 
-function* createFaceMatcher({ classes }) {
+function* createFaceMatcher() {
+  const classes = yield select(selectClasses);
   yield call(face.createFaceMatcher, classes);
 }
 
@@ -207,13 +209,8 @@ function* startScan(action) {
     yield call(face.loadModels);
   }
 
-  yield put(actions.loadClasses());
-  yield take(actions.LOAD_CLASSES_SUCCESS);
-
-  if (action.type === actions.INITIALIZE_SCANNERS) {
-    face.setMedia(action.videoRef.current, action.faceCanvasRef.current);
-    qr.setMedia(action.videoRef.current, action.qrCanvasRef.current);
-  }
+  face.setMedia(action.videoRef.current, action.faceCanvasRef.current);
+  qr.setMedia(action.videoRef.current, action.qrCanvasRef.current);
 
   yield fork(scanFaceWorker);
   yield fork(scanQrWorker);
@@ -222,6 +219,6 @@ function* startScan(action) {
 export default function* sagas() {
   yield all([
     yield takeLatest(actions.INITIALIZE_SCANNERS, startScan),
-    yield takeLatest(actions.LOAD_CLASSES_SUCCESS, createFaceMatcher)
+    yield takeLatest(actions.LOAD_USERS_SUCCESS, createFaceMatcher)
   ]);
 }

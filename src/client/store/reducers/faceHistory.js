@@ -1,10 +1,10 @@
 import {
   FACE_DETECT_SUCCESS,
-  UPDATE_CLASS,
   SAVE_FACE_START,
-  UPDATE_CLASS_SUCCESS,
-  UPDATE_CLASS_FAIL,
-  FACE_DETECT_FAIL
+  FACE_DETECT_FAIL,
+  UPDATE_USER,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER_FAIL
 } from '../actions';
 
 const initialState = {
@@ -32,13 +32,13 @@ export default function face(state = initialState, action) {
           ? state.consecutiveFails + 1
           : 0
       };
-    case UPDATE_CLASS:
+    case UPDATE_USER:
       return {
         ...state,
-        status: UPDATE_CLASS
+        status: UPDATE_USER
       };
-    case UPDATE_CLASS_SUCCESS:
-    case UPDATE_CLASS_FAIL:
+    case UPDATE_USER_SUCCESS:
+    case UPDATE_USER_FAIL:
       return {
         ...state,
         consecutiveFails: 0,

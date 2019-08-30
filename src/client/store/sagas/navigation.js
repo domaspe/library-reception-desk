@@ -115,7 +115,8 @@ function* faceMatchSuccess({ label }) {
   if (yield select(selectIsHibernatedPage)) {
     yield delay(500); // a little delay to show nabigation animation
   }
-  yield put(actions.startSession(label));
+  const userId = Number(label);
+  yield put(actions.startSession(userId));
 }
 
 function* faceNotRecognized() {
@@ -195,9 +196,9 @@ export default function* navigation() {
     yield takeLatest(actions.END_SESSION, endSession),
     yield takeLatest(actions.HIBERNATE, hibernate),
     yield takeLatest(actions.START_SCANNING_FACES, startScanningFaces),
-    yield takeLatest(actions.LOAD_CLASSES_SUCCESS, startScanningFaces),
+    yield takeLatest(actions.LOAD_USERS_SUCCESS, startScanningFaces),
     yield takeLatest(actions.FACE_NOT_RECOGNIZED, faceNotRecognized),
-    yield takeLatest(actions.UPDATE_CLASS_FAIL, faceNotRecognized),
+    yield takeLatest(actions.UPDATE_USER_FAIL, faceNotRecognized),
     yield takeLatest(actions.CREATE_USER, createUser),
     yield takeLatest(actions.FACE_MATCH_SUCCESS, faceMatchSuccess),
     yield takeLatest(actions.HELP, help)

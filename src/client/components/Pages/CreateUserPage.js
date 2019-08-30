@@ -72,7 +72,7 @@ const CreateUserPage = ({
   const [showUserExists, setShowUserExists] = useState(false);
 
   const handleNameChange = useCallback(event => {
-    setName(event.target.value);
+    setName(event.target.value.trim());
   });
   const handleSaveFaceChange = useCallback(event =>
     setSaveFace(!!event.target.checked)
@@ -82,7 +82,7 @@ const CreateUserPage = ({
   const goToNextStep = useCallback(
     (newStep, overwriteUser) => {
       if (newStep === 1) {
-        const userExists = users.find(user => user.id === name);
+        const userExists = users.find(user => user.name === name);
         if (userExists && !overwriteUser) {
           setShowUserExists(true);
           return;
@@ -265,9 +265,7 @@ CreateUserPage.propTypes = {
 const mapStateToProps = state => ({
   progress: selectors.selectFaceDataCollectedPercentage(state) * 0.8 || 0.2,
   users: selectors.selectUsers(state),
-  isSendingData:
-    selectors.selectIsUpdatingClass(state) ||
-    selectors.selectIsLoadingUsers(state)
+  isSendingData: selectors.selectIsUpdatingUser(state)
 });
 
 const mapDispatchToProps = {

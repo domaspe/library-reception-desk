@@ -18,8 +18,10 @@ import {
   selectFaceHistoryDescriptors
 } from '../selectors';
 import fetch from '../../utils/fetch';
-import { mapFloat32ArrayToArr } from '../../utils/float32Array';
-import { mapResponseToClass } from '../../utils/classUtils';
+import {
+  mapFloat32ArrayToArr,
+  mapArrToFloat32Array
+} from '../../utils/float32Array';
 
 const assignFx = new UIfx(assignAudio, {
   volume: 0.4, // number between 0.0 ~ 1.0
@@ -31,37 +33,33 @@ const unassignFx = new UIfx(unassignAudio, {
 });
 
 function* appInit() {
-  yield call(fetch, '/api/reload', 'GET');
   yield all([put(actions.loadItems()), put(actions.loadUsers())]);
 }
 
-function* saveFace({ label, withFace }) {
+function* saveFace({ name, withFace }) {
   if (withFace) {
     yield call(waitFor, selectIsFaceHistoryReady);
     yield delay(1000);
 
     const descriptors = yield select(selectFaceHistoryDescriptors);
 
-    yield put(actions.updateClass(label, descriptors));
+    yield put(actions.updateUser(name, descriptors));
     return;
   }
 
-  yield call(fetch, '/api/users', 'POST', { id: label });
-  yield put(actions.loadUsers());
-  yield put(actions.loadClasses());
+  yield put(actions.updateUser(name));
 }
 
-function* updateClass({ label, descriptors }) {
-  console.debug(`Send "${label}" with ${descriptors.length} descriptors`);
+function* updateUser({ name, descriptors }) {
+  console.debug(`Send "${name}"`);
 
   try {
-    yield call(fetch, '/api/classes', 'POST', {
-      label,
-      descriptors: descriptors.map(mapFloat32ArrayToArr)
+    const users = yield call(fetch, '/api/users', 'POST', {
+      name,
+      descriptors: descriptors ? descriptors.map(mapFloat32ArrayToArr) : null
     });
+    yield put(actions.updateUserSuccess(users));
     yield put(actions.loadUsers());
-    yield put(actions.updateClassSuccess());
-    yield put(actions.loadClasses());
   } catch (err) {
     yield put(actions.updateClassFail());
   }
@@ -74,14 +72,25 @@ function* loadItems() {
 
 function* loadUsers() {
   const users = yield call(fetch, '/api/users', 'GET');
-  yield put(actions.loadUsersSuccess(users));
+
+  yield put(
+    actions.loadUsersSuccess(
+      users.map(user => ({
+        ...user,
+        descriptors: user.descriptors
+          ? user.descriptors.map(mapArrToFloat32Array)
+          : null
+      }))
+    )
+  );
 }
 
 function* tryAssignItem({ itemId, userId }) {
   yield put(actions.assignItemStarted());
 
-  const clearResponse = yield call(fetch, `/api/items/${itemId}`, 'POST', {
-    user: userId
+  const clearResponse = yield call(fetch, '/api/items', 'POST', {
+    id: itemId,
+    userId
   });
 
   if (
@@ -102,20 +111,13 @@ function* tryAssignItem({ itemId, userId }) {
   yield put(actions.assignItemFail());
 }
 
-function* loadClasses() {
-  const classesResponse = yield call(fetch, '/api/classes');
-  const classes = classesResponse.map(mapResponseToClass);
-  yield put(actions.loadClassesSuccess(classes));
-}
-
 export default function* other() {
   yield all([
     yield takeLatest(actions.SAVE_FACE_START, saveFace),
-    yield takeLatest(actions.UPDATE_CLASS, updateClass),
+    yield takeLatest(actions.UPDATE_USER, updateUser),
     yield takeLeading(actions.TRY_ASSIGN_ITEM, tryAssignItem),
     yield takeLatest(actions.APP_INIT, appInit),
     yield takeLatest(actions.LOAD_ITEMS, loadItems),
-    yield takeLatest(actions.LOAD_USERS, loadUsers),
-    yield takeLatest(actions.LOAD_CLASSES, loadClasses)
+    yield takeLatest(actions.LOAD_USERS, loadUsers)
   ]);
 }

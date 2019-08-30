@@ -1,21 +1,22 @@
-const items = require('../../data/defaultItems.json');
 const db = require('./database.js');
 
 const STATUS_ASSIGN_SUCCESS = 'STATUS_ASSIGN_SUCCESS';
 const STATUS_UNASSIGN_SUCCESS = 'STATUS_UNASSIGN_SUCCESS';
-const STATUS_SUCCESS = 'STATUS_SUCCESS';
 const STATUS_FAIL = 'STATUS_FAIL';
 
-function addOrUpdateUser(id, name, descriptors) {
-  if (!id) {
-    return db.addUser(name, descriptors);
+async function addOrUpdateUser(id, name, descriptors) {
+  if (!name) {
+    return new Error('Name is not provided');
   }
 
-  if (descriptors) {
-    return db.updateUser(id, { name, descriptors });
+  const sameUser = await db.getUserByName(name);
+  if (sameUser) {
+    return db.updateUser(sameUser.id, {
+      name,
+      descriptors: descriptors ? JSON.stringify(descriptors) : null
+    });
   }
-
-  return db.updateUser(id, { name });
+  return db.addUser(name, descriptors ? JSON.stringify(descriptors) : null);
 }
 
 function toggleUser(itemId, userId) {
@@ -53,14 +54,17 @@ function getItems() {
 }
 
 function getUsers() {
-  return db.getUsers();
+  return db.getUsers().then(users =>
+    users.map(user => ({
+      ...user,
+      descriptors: JSON.parse(user.descriptors)
+    }))
+  );
 }
 
 module.exports = {
   getItems,
   getUsers,
   toggleUser,
-  addOrUpdateUser,
-  STATUS_SUCCESS,
-  STATUS_FAIL
+  addOrUpdateUser
 };
