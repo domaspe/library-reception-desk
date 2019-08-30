@@ -6,6 +6,7 @@ const nocache = require('nocache');
 const fs = require('fs');
 const https = require('https');
 const handlers = require('./handlers');
+const db = require('./database.js');
 
 const app = express();
 
@@ -23,45 +24,49 @@ app.get('/api/getUsername', (req, res) =>
   res.send({ username: os.userInfo().username })
 );
 
-app.get('/api/reload', (req, res) => {
-  handlers.reloadDatabase();
+app.get('/api/test', (req, res) => {
+  db.getItems().then(users => console.log('>>> users', users));
   return res.sendStatus(200);
 });
 
-app.get('/api/users', (req, res) => {
-  const users = handlers.getUsers();
-  console.log('Users: ', users);
-  return res.json(users);
+app.get('/api/users', (req, res, next) => {
+  return handlers
+    .getUsers()
+    .then(users =>
+      users.map(user => ({
+        ...user,
+        descriptors: JSON.parse(user.descriptors)
+      }))
+    )
+    .then(users => res.json(users))
+    .catch(next);
 });
 
-app.get('/api/classes', (req, res) => {
-  const descriptors = handlers.getDescriptors();
-  return res.json(descriptors);
+app.get('/api/items', (req, res, next) => {
+  return handlers
+    .getItems()
+    .then(items => res.json(items))
+    .catch(next);
 });
 
-app.get('/api/items', (req, res) => {
-  const items = handlers.getItems();
-  return res.json(items);
+app.post('/api/users', (req, res, next) => {
+  const { id, name, descriptors } = req.body;
+  return handlers
+    .addOrUpdateUser(Number(id), name, JSON.stringify(descriptors))
+    .then(() => res.sendStatus(200))
+    .catch(next);
 });
 
-app.post('/api/classes', (req, res) => {
-  const { descriptors, label } = req.body;
-  handlers.updateOrAddDescriptors(label, descriptors);
-  res.sendStatus(200);
-});
-
-app.post('/api/users', (req, res) => {
-  const { id } = req.body;
-  handlers.updateOrAddUser(id);
-  res.sendStatus(200);
-});
-
-app.post('/api/items/:id', (req, res) => {
-  const { user } = req.body;
-  const status = handlers.toggleUser(Number(req.params.id), user);
-  res.status(200).json({
-    status
-  });
+app.post('/api/items', (req, res) => {
+  const { id, userId } = req.body;
+  return handlers
+    .toggleUser(Number(id), Number(userId))
+    .then(status =>
+      res.status(200).json({
+        status
+      })
+    )
+    .catch(err => err);
 });
 
 // / error handlers
