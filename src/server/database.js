@@ -131,7 +131,7 @@ function addUser(name, descriptors) {
 }
 
 function getItems() {
-  return all('SELECT * FROM items').then(items => items.slice(0, 10));
+  return all('SELECT * FROM items');
 }
 
 function getItem(id) {

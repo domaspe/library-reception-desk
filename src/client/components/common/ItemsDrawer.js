@@ -25,6 +25,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
+    height: 64,
     justifyContent: 'space-between'
   },
   drawerName: {
@@ -36,7 +37,8 @@ const useStyles = makeStyles(theme => ({
   content: {
     width: '70vw',
     minWidth: 400,
-    maxWidth: '70vw'
+    maxWidth: '70vw',
+    height: 'calc(100% - 64px)'
   }
 }));
 
