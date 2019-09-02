@@ -99,7 +99,7 @@ function* performFaceScan() {
   if (isReadingFace) {
     const faceMissingForHistory = yield select(selectFaceMissingForHistory);
     if (faceMissingForHistory) {
-      yield put(actions.updateClassFail());
+      yield put(actions.updateUserFail());
     }
   }
 }

@@ -61,7 +61,7 @@ function* updateUser({ name, descriptors }) {
     yield put(actions.updateUserSuccess(users));
     yield put(actions.loadUsers());
   } catch (err) {
-    yield put(actions.updateClassFail());
+    yield put(actions.updateUserFail());
   }
 }
 

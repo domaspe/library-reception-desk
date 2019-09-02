@@ -263,7 +263,7 @@ CreateUserPage.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  progress: selectors.selectFaceDataCollectedPercentage(state) * 0.8 || 0.2,
+  progress: selectors.selectFaceDataCollectedPercentage(state),
   users: selectors.selectUsers(state),
   isSendingData: selectors.selectIsUpdatingUser(state)
 });

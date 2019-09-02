@@ -34,6 +34,7 @@ const ChooseUserButton = ({ users, onUserPick }) => {
         color="primary"
         onClick={handleUserMenuOpen}
         className={classes.button}
+        disabled={!users.length}
       >
         Choose existing user
       </Button>

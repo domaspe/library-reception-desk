@@ -45,6 +45,7 @@ app.get('/api/items', (req, res, next) => {
 
 app.post('/api/users', (req, res, next) => {
   const { id, name, descriptors } = req.body;
+  console.log('>>> ', { id, name });
   return handlers
     .addOrUpdateUser(Number(id), name, descriptors)
     .then(() => res.sendStatus(200))
@@ -78,16 +79,16 @@ app.use(function errorHandler(err, req, res, next) {
   });
 });
 
-let server = app;
+let httpsServer = null;
 if (process.env.NODE_ENV === 'production') {
   const httpsOptions = {
     cert: fs.readFileSync(path.join(rootDir, 'ssl', 'root.cert')),
     key: fs.readFileSync(path.join(rootDir, 'ssl', 'root.key'))
   };
 
-  server = https.createServer(httpsOptions, app);
+  httpsServer = https.createServer(httpsOptions, app);
 }
 
-server.listen(process.env.PORT || 8080, () =>
-  console.log(`Listening on port ${process.env.PORT || 8080}!`)
-);
+(httpsServer || app).listen(process.env.PORT || 8080, () => {
+  console.log(`Listening on port ${process.env.PORT || 8080}!`);
+});

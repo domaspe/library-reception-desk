@@ -1,54 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dataPath = path.join(__dirname, '../../data');
+const dataPath = path.join(__dirname, '../../database');
+const pathToDatabase = path.join(dataPath, 'local.sqlite3');
 
-let db;
-
-function createTables() {
-  db.serialize(() => {
-    db.run(
-      `
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        name TEXT NOT NULL,
-        descriptors TEXT
-      );
-  `,
-      (res, err) => {
-        console.error('Create table "users" result', res, err);
-      }
-    );
-
-    db.run(
-      `
-      CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        primaryTitle TEXT NOT NULL,
-        secondaryTitle TEXT,
-        description TEXT,
-        thumbnailUrl TEXT  NOT NULL,
-        takenByUserId INTEGER,
-        accessoryTaken INTEGER,
-        timeTaken INTEGER
-      );
-  `,
-      (res, err) => {
-        console.error('Create table "items" result', res, err);
-      }
-    );
-  });
-}
-
-db = new sqlite3.Database(path.join(dataPath, 'database.sqlite3'), err => {
+const db = new sqlite3.Database(pathToDatabase, err => {
   if (err) {
-    console.log('Failed to start database', err);
-    return;
+    console.log('Failed to start database', pathToDatabase, err);
   }
-
-  console.log('Init database');
-
-  createTables();
 });
 
 function closeDb() {
@@ -113,7 +72,6 @@ function getUserByName(name) {
 }
 
 async function updateUser(id, data) {
-  console.log('>>> id', id);
   const user = await getUser(id);
   const updated = { ...user, ...data };
   return run('UPDATE users SET name = ?, descriptors = ? WHERE id = ?', [
@@ -156,6 +114,13 @@ function updateItem(id, data) {
   });
 }
 
+function log(itemId, userId, action, info) {
+  return run(
+    'INSERT INTO log (userId, itemId, action, info, timestamp) VALUES(?, ?, ?, ?, ?)',
+    [userId, itemId, action, info, Date.now()]
+  );
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -164,5 +129,6 @@ module.exports = {
   addUser,
   getItems,
   getItem,
-  updateItem
+  updateItem,
+  log
 };

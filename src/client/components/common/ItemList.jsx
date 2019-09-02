@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   itemContainer: {
-    padding: theme.spacing(2, 2, 1, 2)
+    padding: theme.spacing(2, 2, 0.5, 2)
   },
   item: {
     padding: theme.spacing(0, 2, 0, 2),

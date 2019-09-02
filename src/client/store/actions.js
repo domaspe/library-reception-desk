@@ -84,6 +84,12 @@ export function updateUserSuccess(users) {
   };
 }
 
+export function updateUserFail() {
+  return {
+    type: UPDATE_USER_FAIL
+  };
+}
+
 export function faceMatchSuccess(label) {
   return {
     type: FACE_MATCH_SUCCESS,

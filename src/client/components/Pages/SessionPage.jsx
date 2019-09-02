@@ -5,7 +5,6 @@ import {
   Typography,
   Tabs,
   Tab,
-  Box,
   AppBar,
   Badge
 } from '@material-ui/core';
@@ -37,13 +36,15 @@ const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   tabText: {
-    padding: theme.spacing(2, 2, 0, 2)
+    margin: theme.spacing(2, 2, 0, 2),
+    minHeight: 50
   },
-  tabContent: {
-    paddingBottom: theme.spacing(2)
-  },
+  tabContent: {},
   badge: {
     padding: theme.spacing(0, 2)
+  },
+  swipeableSlide: {
+    overflow: 'hidden !important' // Override swipeable style prop
   }
 }));
 
@@ -143,6 +144,7 @@ const SessionPage = memo(
           index={tab}
           onChangeIndex={handleSwipeChange}
           className={classes.swipeable}
+          slideClassName={classes.swipeableSlide}
         >
           <>
             <div className={classes.tabText}>
@@ -156,7 +158,7 @@ const SessionPage = memo(
               <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
             </div>
           </>
-          <Box>
+          <>
             <div className={classes.tabText}>
               <Typography color="textPrimary" align="center" gutterBottom>
                 Here you can see all items still available. Click on&nbsp;
@@ -171,7 +173,7 @@ const SessionPage = memo(
                 showAdd
               />
             </div>
-          </Box>
+          </>
         </SwipeableViews>
       </Layout>
     );

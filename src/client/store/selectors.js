@@ -27,10 +27,13 @@ const selectUsersState = state => state.users;
 const selectActiveUserState = state => state.activeUser;
 const selectRouterState = state => state.router;
 
+export function selectFaceHistoryDescriptors(state) {
+  const { descriptors } = selectFaceHistoryState(state);
+  return descriptors.slice(0, 10);
+}
+
 export function selectIsFaceHistoryReady(state) {
-  return (
-    selectFaceHistoryState(state).descriptors.length >= DESCRIPTORS_PER_CLASS
-  );
+  return selectFaceHistoryDescriptors(state).length >= DESCRIPTORS_PER_CLASS;
 }
 
 export function selectIsReadingFace(state) {
@@ -51,14 +54,8 @@ export function selectIsLoadingUsers(state) {
 
 export function selectFaceDataCollectedPercentage(state) {
   return selectIsSavingFace(state)
-    ? (selectFaceHistoryState(state).descriptors.length /
-        DESCRIPTORS_PER_CLASS) *
-        100
+    ? (selectFaceHistoryDescriptors(state).length / DESCRIPTORS_PER_CLASS) * 100
     : 0;
-}
-
-export function selectFaceHistoryDescriptors(state) {
-  return selectFaceHistoryState(state).descriptors;
 }
 
 export function selectIsFaceDetected(state) {
