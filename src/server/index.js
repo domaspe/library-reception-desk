@@ -52,7 +52,7 @@ app.post('/api/users', (req, res, next) => {
     .catch(next);
 });
 
-app.post('/api/items', (req, res) => {
+app.post('/api/items', (req, res, next) => {
   const { id, userId } = req.body;
   return handlers
     .toggleUser(Number(id), Number(userId))
@@ -61,7 +61,7 @@ app.post('/api/items', (req, res) => {
         status
       })
     )
-    .catch(err => err);
+    .catch(next);
 });
 
 // / error handlers

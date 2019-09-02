@@ -18,7 +18,6 @@ function closeDb() {
 
 ['exit', 'SIGINT', `SIGHUP`].forEach(eventType => {
   process.on(eventType, () => {
-    console.log('Received event:', eventType);
     closeDb();
   });
 });
@@ -29,7 +28,6 @@ function run(query, args) {
       if (err) {
         return reject(err);
       }
-
       return resolve();
     });
   });
@@ -100,10 +98,11 @@ function updateItem(id, data) {
   return getItem(id).then(item => {
     const updated = { ...item, ...data };
     return run(
-      'UPDATE items SET primaryTitle = ?, secondaryTitle = ?, thumbnailUrl = ?, takenByUserId = ?, accessoryTaken = ?, timeTaken = ? WHERE id = ?',
+      'UPDATE items SET primaryTitle = ?, secondaryTitle = ?, description = ?, thumbnailUrl = ?, takenByUserId = ?, accessoryTaken = ?, timeTaken = ? WHERE id = ?',
       [
         updated.primaryTitle,
         updated.secondaryTitle,
+        updated.description,
         updated.thumbnailUrl,
         updated.takenByUserId,
         updated.accessoryTaken,

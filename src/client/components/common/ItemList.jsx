@@ -64,22 +64,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+function createTitle({ primaryTitle, secondaryTitle, description }) {
+  return [primaryTitle, secondaryTitle, description && `\n${description}`]
+    .filter(item => item)
+    .join('\n');
+}
+
 const ItemList = ({ onItemClick, items, showAdd, height: componentHeight }) => {
   const classes = useStyles();
   const rowRenderer = ({ index, style }) => {
     const item = items[index];
     return (
       <div className={classes.itemContainer} style={style} key={item.id}>
-        <Paper
-          className={classes.item}
-          title={`${item.primaryTitle}\nBy ${item.secondaryTitle}`}
-        >
+        <Paper className={classes.item} title={createTitle(item)}>
           <div className={classes.itemContent}>
             <div className={classes.thumbnailContainer}>
               <Box
                 className={classes.thumbnail}
                 style={{
-                  backgroundImage: `url("${item.thumbnailUrl}")`
+                  backgroundImage: item.thumbnailUrl
+                    ? `url("${item.thumbnailUrl}")`
+                    : undefined
                 }}
               />
             </div>
