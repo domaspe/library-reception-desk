@@ -8,10 +8,12 @@ const HiddenCamera = ({ scanStart }) => {
   const qrCanvasRef = React.useRef();
 
   React.useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
-      videoRef.current.srcObject = stream;
-      videoRef.current.play();
-    });
+    if (navigator.mediaDevices && videoRef.current) {
+      navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      });
+    }
   }, [videoRef]);
 
   const start = React.useCallback(() => {

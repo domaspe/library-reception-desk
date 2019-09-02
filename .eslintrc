@@ -19,7 +19,7 @@
   "plugins": ["react"],
   "rules": {
     "import/prefer-default-export": 0,
-    "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx"] }],
     "react/prop-types": 0,
     "react/jsx-wrap-multilines": 0,
     "react/forbid-prop-types": 0,

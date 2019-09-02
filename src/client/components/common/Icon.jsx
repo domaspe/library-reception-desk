@@ -11,7 +11,11 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const Icon = ({ src, size, className, ...props }) => {
+type asd {
+  scr: string
+}
+
+const Icon = ({ src, size, className, ...props }: ) => {
   const classes = useStyles();
   return (
     <div
