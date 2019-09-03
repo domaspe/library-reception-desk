@@ -14,7 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ItemList from './ItemList';
 import {
   selectIsItemsDrawerOpen,
-  createItemsFilterSelector
+  createAllItemsFilterSelector
 } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Icon from './Icon';
@@ -41,8 +41,8 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     width: '70vw',
+    maxWidth: 850,
     minWidth: 400,
-    maxWidth: '70vw',
     height: 'calc(100% - 64px)'
   }
 }));
@@ -82,6 +82,7 @@ const ItemsDrawer = ({
           items={items}
           onItemClick={handlRemoveItemClick}
           height="100%"
+          animate={false}
         />
       </Box>
     </Drawer>
@@ -96,7 +97,7 @@ ItemsDrawer.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  selectFilteredItems: createItemsFilterSelector(state),
+  selectFilteredItems: createAllItemsFilterSelector(state),
   open: selectIsItemsDrawerOpen(state)
 });
 

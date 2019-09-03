@@ -1,5 +1,12 @@
-import React from 'react';
-import { Typography, IconButton, Paper, Box, Fade } from '@material-ui/core';
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  Typography,
+  IconButton,
+  Paper,
+  Box,
+  Fade,
+  Grow
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
@@ -70,12 +77,38 @@ function createTitle({ primaryTitle, secondaryTitle, description }) {
     .join('\n');
 }
 
-const ItemList = ({ onItemClick, items, showAdd, height: componentHeight }) => {
+const ItemList = ({
+  onItemClick,
+  items,
+  showAdd,
+  height: componentHeight,
+  animate
+}) => {
   const classes = useStyles();
+  const [outId, setOutId] = useState(null);
+  useEffect(() => {
+    setOutId(null);
+  }, [items.length]);
+
+  const handleItemClick = useCallback(
+    id => {
+      if (animate) {
+        setOutId(id);
+        return;
+      }
+
+      onItemClick(id);
+    },
+    [animate]
+  );
+  const handleItemExit = useCallback(() => {
+    onItemClick(outId);
+  }, [outId]);
+
   const rowRenderer = ({ index, style }) => {
     const item = items[index];
-    return (
-      <div className={classes.itemContainer} style={style} key={item.id}>
+    const itemComponent = (
+      <div key={item.id} className={classes.itemContainer} style={style}>
         <Paper className={classes.item} title={createTitle(item)}>
           <div className={classes.itemContent}>
             <div className={classes.thumbnailContainer}>
@@ -95,22 +128,28 @@ const ItemList = ({ onItemClick, items, showAdd, height: componentHeight }) => {
               <Typography className={classes.secondaryTitle} noWrap>
                 {item.secondaryTitle}
               </Typography>
-              {!!item.user && (
+              {!!item.takenByUser && (
                 <Typography variant="caption" noWrap>
                   {'Taken '}
                   {moment(item.timeTaken).format('MMM Do, hh:mm')}
                   {' by '}
-                  <span className={classes.user}>{item.user.name}</span>
+                  <span className={classes.user}>{item.takenByUser.name}</span>
                 </Typography>
               )}
             </div>
             {showAdd && (
-              <IconButton color="primary" onClick={() => onItemClick(item.id)}>
+              <IconButton
+                color="primary"
+                onClick={() => handleItemClick(item.id)}
+              >
                 <AddIcon />
               </IconButton>
             )}
             {!showAdd && !!item.timeTaken && (
-              <IconButton color="primary" onClick={() => onItemClick(item.id)}>
+              <IconButton
+                color="primary"
+                onClick={() => handleItemClick(item.id)}
+              >
                 <CloseIcon />
               </IconButton>
             )}
@@ -118,6 +157,22 @@ const ItemList = ({ onItemClick, items, showAdd, height: componentHeight }) => {
         </Paper>
       </div>
     );
+
+    if (animate) {
+      return (
+        <Grow
+          enter={false}
+          in={!outId || item.id !== outId}
+          onExit={handleItemExit}
+          key={`${item.id}_grow`}
+          appear={false}
+        >
+          {itemComponent}
+        </Grow>
+      );
+    }
+
+    return itemComponent;
   };
 
   const emptyRenderer = () => (
@@ -141,7 +196,7 @@ const ItemList = ({ onItemClick, items, showAdd, height: componentHeight }) => {
       <AutoSizer>
         {({ height, width }) => (
           <List
-            className={classes.list}
+            className={`${classes.list} scrollbox`}
             height={height}
             width={width}
             noRowsRenderer={emptyRenderer}
@@ -161,7 +216,12 @@ ItemList.propTypes = {
   onItemClick: PropTypes.func.isRequired,
   items: PropTypes.array.isRequired,
   showAdd: PropTypes.bool,
-  height: PropTypes.any
+  height: PropTypes.any,
+  animate: PropTypes.bool
+};
+
+ItemList.defaultProps = {
+  animate: true
 };
 
 export default ItemList;

@@ -18,7 +18,6 @@ import {
   MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS,
   MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
 } from '../constants';
-import createItemFinder from '../utils/createItemFinder';
 
 const selectFaceState = state => state.face;
 const selectFaceMatchState = state => state.faceMatch;
@@ -28,6 +27,9 @@ const selectItemsState = state => state.items;
 const selectUsersState = state => state.users;
 const selectActiveUserState = state => state.activeUser;
 const selectRouterState = state => state.router;
+
+const sortByKey = key => (a, b) => (a[key] > b[key] ? 1 : -1);
+const sortByTime = key => (a, b) => new Date(b[key]) - new Date(a[key]);
 
 export function selectFaceHistoryDescriptors(state) {
   const { descriptors } = selectFaceHistoryState(state);
@@ -97,24 +99,25 @@ export function selectActiveUser(state) {
 
 export const selectItemsStateItems = createSelector(
   selectItemsState,
-  itemsState => itemsState.items
+  selectUsers,
+  (itemsState, users) => {
+    return itemsState.items.map(item => ({
+      ...item,
+      takenByUser: users.find(user => user.id === item.takenByUserId)
+    }));
+  }
 );
 
 export const selectItemsStateItemsSortedByTime = createSelector(
   selectItemsStateItems,
-  items => items.sort((a, b) => new Date(b.timeTaken) - new Date(a.timeTaken))
+  items => [...items].sort(sortByTime('timeTaken'))
 );
 
 export const selectItemsStateItemsSortedByTitle = createSelector(
   selectItemsStateItems,
-  items =>
-    items.sort((a, b) => {
-      if (a.primaryTitle > b.primaryTitle) return 1;
-      if (a.primaryTitle < b.primaryTitle) return -1;
-      if (a.secondaryTitle > b.secondaryTitle) return 1;
-      if (a.secondaryTitle < b.secondaryTitle) return -1;
-      return 0;
-    })
+  items => {
+    return [...items].sort(sortByKey('stringified'));
+  }
 );
 
 export function selectClassesLoaded(state) {
@@ -150,42 +153,32 @@ export const selectFreeItems = createSelector(
   items => items.filter(item => !item.timeTaken)
 );
 
-const selectFilteredItems = createSelector(
-  config => config.filterPhrase,
-  config => config.items,
-  (filterPhrase, items) => {
-    const filter = filterPhrase.trim().toLowerCase();
-    if (!filter || filter.length < 2) {
-      return items;
-    }
-
-    const filteredItems = filter
-      .split(' ')
-      .filter(word => word)
-      .flatMap(word =>
-        items.filter(item => item.stringified.indexOf(word) >= 0)
-      );
-
-    return filteredItems;
+const selectFilteredItems = (filterPhrase, items) => {
+  const filter = filterPhrase.trim().toLowerCase();
+  if (!filter || filter.length < 2) {
+    return items;
   }
-);
+
+  const filteredItems = filter
+    .split(' ')
+    .filter(word => word)
+    .flatMap(word => items.filter(item => item.stringified.indexOf(word) >= 0));
+
+  return filteredItems;
+};
 
 export const createFreeItemsFilterSelector = createSelector(
   selectFreeItems,
-  freeItems => filter =>
-    selectFilteredItems({
-      filterPhrase: filter,
-      items: freeItems
-    })
+  freeItems => filter => selectFilteredItems(filter, freeItems)
 );
 
-export const createItemsFilterSelector = createSelector(
+export const createAllItemsFilterSelector = createSelector(
   selectItemsStateItemsSortedByTitle,
-  items => filter =>
-    selectFilteredItems({
-      filterPhrase: filter,
-      items
-    })
+  items => {
+    return filter => {
+      return selectFilteredItems(filter, items); // : items.sort(sortByKey('stringified'))
+    };
+  }
 );
 
 function selectPathname(state) {

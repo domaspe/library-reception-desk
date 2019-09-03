@@ -12,7 +12,6 @@ import { hot } from 'react-hot-loader';
 import HiddenCamera from './HiddenCamera';
 import * as actions from '../store/actions';
 
-import './app.css';
 import SleepPage from './pages/SleepPage';
 import FaceScanPage from './pages/FaceScanPage';
 import NotRecognizedPage from './pages/NotRecognizedPage';
@@ -32,6 +31,8 @@ import { theme } from '../utils/theme';
 import Test from './common/Test';
 import ItemsDrawer from './common/ItemsDrawer';
 import ItemDrawerButton from './common/ItemDrawerButton';
+
+import './app.css';
 
 function mapStyles(styles) {
   return {
