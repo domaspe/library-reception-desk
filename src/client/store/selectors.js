@@ -1,4 +1,5 @@
 import { matchPath } from 'react-router-dom';
+import { createSelector } from 'reselect';
 import {
   SAVE_FACE_START,
   FACE_DETECT_SUCCESS,
@@ -17,6 +18,7 @@ import {
   MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS,
   MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
 } from '../constants';
+import createItemFinder from '../utils/createItemFinder';
 
 const selectFaceState = state => state.face;
 const selectFaceMatchState = state => state.faceMatch;
@@ -84,31 +86,36 @@ export function selectUsers(state) {
   return selectUsersState(state).users;
 }
 
-export function selectItems(state, sortBy = 'timeTaken') {
-  const { items } = selectItemsState(state);
-  let sorted = items;
-  if (sortBy === 'timeTaken') {
-    sorted = items.sort(
-      (a, b) => new Date(b.timeTaken) - new Date(a.timeTaken)
-    );
-  }
+export function selectActiveUserId(state) {
+  return selectActiveUserState(state).id;
+}
 
-  if (sortBy === 'title') {
-    sorted = items.sort((a, b) => {
+export function selectActiveUser(state) {
+  const userId = selectActiveUserId(state);
+  return selectUsers(state).find(user => user.id === userId);
+}
+
+export const selectItemsStateItems = createSelector(
+  selectItemsState,
+  itemsState => itemsState.items
+);
+
+export const selectItemsStateItemsSortedByTime = createSelector(
+  selectItemsStateItems,
+  items => items.sort((a, b) => new Date(b.timeTaken) - new Date(a.timeTaken))
+);
+
+export const selectItemsStateItemsSortedByTitle = createSelector(
+  selectItemsStateItems,
+  items =>
+    items.sort((a, b) => {
       if (a.primaryTitle > b.primaryTitle) return 1;
       if (a.primaryTitle < b.primaryTitle) return -1;
       if (a.secondaryTitle > b.secondaryTitle) return 1;
       if (a.secondaryTitle < b.secondaryTitle) return -1;
       return 0;
-    });
-  }
-
-  const users = selectUsers(state);
-  return sorted.map(item => ({
-    ...item,
-    user: users.find(user => user.id === item.takenByUserId) || null
-  }));
-}
+    })
+);
 
 export function selectClassesLoaded(state) {
   return selectUsers(state).length > 0;
@@ -131,19 +138,55 @@ export function selectNotifyAssignItemSuccess(state) {
   );
 }
 
-export function selectUserItems(state, user, sortBy) {
-  return selectItems(state, sortBy).filter(
-    item => String(item.takenByUserId) === String(user)
-  );
-}
+export const selectUserItems = createSelector(
+  selectItemsStateItemsSortedByTime,
+  selectActiveUserId,
+  (items, userId) =>
+    items.filter(item => String(item.takenByUserId) === String(userId))
+);
 
-export function selectUserHasItem(state, user, itemId) {
-  return !!selectUserItems(state, user).find(item => item.id === itemId);
-}
+export const selectFreeItems = createSelector(
+  selectItemsStateItemsSortedByTitle,
+  items => items.filter(item => !item.timeTaken)
+);
 
-export function selectFreeItems(state, sortBy) {
-  return selectItems(state, sortBy).filter(item => !item.timeTaken);
-}
+const selectFilteredItems = createSelector(
+  config => config.filterPhrase,
+  config => config.items,
+  (filterPhrase, items) => {
+    const filter = filterPhrase.trim().toLowerCase();
+    if (!filter || filter.length < 2) {
+      return items;
+    }
+
+    const filteredItems = filter
+      .split(' ')
+      .filter(word => word)
+      .flatMap(word =>
+        items.filter(item => item.stringified.indexOf(word) >= 0)
+      );
+
+    return filteredItems;
+  }
+);
+
+export const createFreeItemsFilterSelector = createSelector(
+  selectFreeItems,
+  freeItems => filter =>
+    selectFilteredItems({
+      filterPhrase: filter,
+      items: freeItems
+    })
+);
+
+export const createItemsFilterSelector = createSelector(
+  selectItemsStateItemsSortedByTitle,
+  items => filter =>
+    selectFilteredItems({
+      filterPhrase: filter,
+      items
+    })
+);
 
 function selectPathname(state) {
   const { pathname } = selectRouterState(state).location;
@@ -177,13 +220,4 @@ export function selectIsHelpPage(state) {
 
 export function selectIsItemsDrawerOpen(state) {
   return state.itemsDrawer.open;
-}
-
-export function selectActiveUserId(state) {
-  return selectActiveUserState(state).id;
-}
-
-export function selectActiveUser(state) {
-  const userId = selectActiveUserId(state);
-  return selectUsers(state).find(user => user.id === userId);
 }

@@ -25,3 +25,11 @@ export function useIconAnimation(shouldAnimate) {
 
   return [animate, onAnimationEnd];
 }
+
+export function useSearchFilter(selector) {
+  const [filter, setFilter] = useState('');
+  const handleFilterChange = useCallback(setFilter);
+  const filteredItems = selector(filter);
+
+  return [filteredItems, handleFilterChange];
+}

@@ -10,7 +10,7 @@
     "server": "nodemon src/server/index.js",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-  "author": "Sandeep Raveesh",
+  "author": "Domas Petkevicius",
   "license": "ISC",
   "dependencies": {
     "@hot-loader/react-dom": "^16.9.0",
@@ -25,6 +25,7 @@
     "history": "^4.9.0",
     "jsonfile": "^5.0.0",
     "jsqr": "^1.2.0",
+    "lodash.throttle": "^4.1.1",
     "lowdb": "^1.0.0",
     "moment": "^2.24.0",
     "nocache": "^2.1.0",

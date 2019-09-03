@@ -11,18 +11,18 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import SwipeableViews from 'react-swipeable-views';
-import AddIcon from '@material-ui/icons/Add';
 import shallowequal from 'shallowequal';
 import {
   selectNotifyAssignItemSuccess,
-  selectFreeItems,
   selectUserItems,
-  selectActiveUser
+  selectActiveUser,
+  createFreeItemsFilterSelector
 } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
-import { useIconAnimation } from '../../utils/hooks';
+import { useIconAnimation, useSearchFilter } from '../../utils/hooks';
 import ItemList from '../common/ItemList';
+import SearchField from '../common/SearchField';
 
 const useStyles = makeStyles(theme => ({
   name: {
@@ -35,9 +35,15 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     width: '100%'
   },
-  tabText: {
-    margin: theme.spacing(2, 2, 0, 2),
-    minHeight: 50
+  tabTop: {
+    margin: theme.spacing(2),
+    minHeight: 50,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  searchContainer: {
+    marginLeft: theme.spacing(2)
   },
   tabContent: {},
   badge: {
@@ -60,7 +66,7 @@ const SessionPage = memo(
     userId,
     userName,
     onLogout,
-    freeItems,
+    selectFilteredFreeItems,
     userItems,
     assignItemSuccess,
     assignItem
@@ -78,6 +84,10 @@ const SessionPage = memo(
     );
     const handlRemoveItemClick = useCallback(itemId =>
       assignItem(itemId, null)
+    );
+
+    const [freeItems, handleFilterChange] = useSearchFilter(
+      selectFilteredFreeItems
     );
 
     return (
@@ -147,24 +157,34 @@ const SessionPage = memo(
           slideClassName={classes.swipeableSlide}
         >
           <>
-            <div className={classes.tabText}>
-              <Typography color="textPrimary" align="center" gutterBottom>
+            <div className={classes.tabTop}>
+              <Typography
+                color="textPrimary"
+                align="center"
+                gutterBottom
+                variant="body2"
+              >
                 Below are the devices that you’ve taken out. If you want to
                 take/return a device, face the QR code on the back of the device
                 towards the camera.
               </Typography>
             </div>
-            <div className={classes.tabContent}>
-              <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
-            </div>
+            <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
           </>
           <>
-            <div className={classes.tabText}>
-              <Typography color="textPrimary" align="center" gutterBottom>
-                Here you can see all items still available. Click on&nbsp;
-                <AddIcon />
-                &nbsp; to reserve the item.
+            <div className={classes.tabTop}>
+              <Typography
+                color="textPrimary"
+                align="center"
+                gutterBottom
+                variant="body2"
+              >
+                Here you can see all items still available. Click on + to
+                reserve the item.
               </Typography>
+              <div className={classes.searchContainer}>
+                <SearchField onChange={handleFilterChange} />
+              </div>
             </div>
             <div className={classes.tabContent}>
               <ItemList
@@ -186,7 +206,7 @@ SessionPage.propTypes = {
   assignItem: PropTypes.func.isRequired,
   userId: PropTypes.number,
   userName: PropTypes.string,
-  freeItems: PropTypes.array.isRequired,
+  selectFilteredFreeItems: PropTypes.func.isRequired,
   userItems: PropTypes.array.isRequired
 };
 
@@ -196,8 +216,8 @@ const mapStateToProps = state => {
     userId: user.id,
     userName: user.name,
     assignItemSuccess: selectNotifyAssignItemSuccess(state),
-    freeItems: selectFreeItems(state, 'title'),
-    userItems: selectUserItems(state, user.id, 'timeTaken')
+    selectFilteredFreeItems: createFreeItemsFilterSelector(state),
+    userItems: selectUserItems(state)
   };
 };
 

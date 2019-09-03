@@ -1,7 +1,9 @@
 {
   "allowJs": true,
   "compilerOptions": {
-    "target": "es6"
+    "target": "es6",
+    "jsx": "react",
+    "module": "commonjs"
   },
-  "exclude": ["node_modules", "database"]
+  "exclude": ["database"]
 }

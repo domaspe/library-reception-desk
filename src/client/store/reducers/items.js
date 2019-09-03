@@ -18,7 +18,10 @@ export default function items(state = initialState, action) {
     case LOAD_ITEMS_SUCCESS:
       return {
         ...state,
-        items: action.items,
+        items: action.items.map(item => ({
+          ...item,
+          stringified: `${item.primaryTitle} ${item.secondaryTitle}`.toLowerCase()
+        })),
         status: LOAD_ITEMS_SUCCESS,
         timestamp: Date.now()
       };

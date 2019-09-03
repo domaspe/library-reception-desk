@@ -12,9 +12,14 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ItemList from './ItemList';
-import { selectItems, selectIsItemsDrawerOpen } from '../../store/selectors';
+import {
+  selectIsItemsDrawerOpen,
+  createItemsFilterSelector
+} from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Icon from './Icon';
+import SearchField from './SearchField';
+import { useSearchFilter } from '../../utils/hooks';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -42,10 +47,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ItemsDrawer = ({ open, items, setDrawerOpen, assignItem }) => {
+const ItemsDrawer = ({
+  open,
+  selectFilteredItems,
+  setDrawerOpen,
+  assignItem
+}) => {
   const classes = useStyles();
   const handlRemoveItemClick = useCallback(itemId => assignItem(itemId, null));
   const handleClose = useCallback(() => setDrawerOpen(false));
+
+  const [items, handleFilterChange] = useSearchFilter(selectFilteredItems);
+
   return (
     <Drawer open={open} onClose={handleClose}>
       <div className={classes.drawerHeader}>
@@ -54,6 +67,9 @@ const ItemsDrawer = ({ open, items, setDrawerOpen, assignItem }) => {
           <Typography variant="h6" color="textPrimary" align="center">
             All items
           </Typography>
+        </div>
+        <div>
+          <SearchField onChange={handleFilterChange} open={open} />
         </div>
         <IconButton onClick={handleClose}>
           <ChevronLeftIcon />
@@ -74,13 +90,13 @@ const ItemsDrawer = ({ open, items, setDrawerOpen, assignItem }) => {
 
 ItemsDrawer.propTypes = {
   assignItem: PropTypes.func.isRequired,
-  items: PropTypes.array.isRequired,
+  selectFilteredItems: PropTypes.array.isRequired,
   setDrawerOpen: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
-  items: selectItems(state, 'title'),
+  selectFilteredItems: createItemsFilterSelector(state),
   open: selectIsItemsDrawerOpen(state)
 });
 
