@@ -27,7 +27,17 @@ const HiddenCamera = ({ scanStart }) => {
   });
 
   return (
-    <div className="smart-camera-container">
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
+    <div
+      className="smart-camera-container hidden"
+      onClick={evt => {
+        if (evt.detail === 4) {
+          document
+            .getElementsByClassName('smart-camera-container')[0]
+            .classList.toggle('hidden');
+        }
+      }}
+    >
       <video
         ref={videoRef}
         onLoadedMetadata={start}
