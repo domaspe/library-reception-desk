@@ -50,7 +50,6 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1)
   },
   stepper: {
-    width: '100%',
     marginBottom: theme.spacing(4)
   },
   progress: {
