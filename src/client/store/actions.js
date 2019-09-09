@@ -90,10 +90,11 @@ export function updateUserFail() {
   };
 }
 
-export function faceMatchSuccess(label) {
+export function faceMatchSuccess(label, distance) {
   return {
     type: FACE_MATCH_SUCCESS,
-    label
+    label,
+    distance
   };
 }
 

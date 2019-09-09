@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Button,
@@ -12,6 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import SwipeableViews from 'react-swipeable-views';
 import shallowequal from 'shallowequal';
+import classNames from 'classnames';
 import {
   selectNotifyAssignItemSuccess,
   selectUserItems,
@@ -25,6 +26,9 @@ import ItemList from '../common/ItemList';
 import SearchField from '../common/SearchField';
 
 const useStyles = makeStyles(theme => ({
+  username: {
+    display: 'flex'
+  },
   name: {
     fontWeight: 'bold'
   },
@@ -75,7 +79,7 @@ const SessionPage = memo(
     const [animateIcon, onIconAnimationEnd] = useIconAnimation(
       assignItemSuccess
     );
-    const [tab, setTab] = React.useState(0);
+    const [tab, setTab] = useState(0);
     const handleTabChange = (event, newValue) => setTab(newValue);
     const handleSwipeChange = index => setTab(index);
 
@@ -90,6 +94,12 @@ const SessionPage = memo(
       selectFilteredFreeItems
     );
 
+    const [animateUser, setAnimateUser] = useState(false);
+    useEffect(() => {
+      const timeout = setTimeout(() => setAnimateUser(true), 2000);
+      return () => clearTimeout(timeout);
+    }, []);
+
     return (
       <Layout
         iconSrc="/assets/qr.svg"
@@ -97,22 +107,33 @@ const SessionPage = memo(
         onIconAnimationEnd={onIconAnimationEnd}
         titleComponent={
           <>
-            <Typography
-              variant="h6"
-              color="textPrimary"
-              align="center"
-              className={classes.greeting}
+            <div
+              className={classNames('username-overlay-enter', {
+                'username-overlay-exit': animateUser
+              })}
+            />
+            <div
+              className={classNames(classes.username, 'username-enter', {
+                'username-exit': animateUser
+              })}
             >
-              Hey there,&nbsp;
-            </Typography>
-            <Typography
-              variant="h6"
-              color="textPrimary"
-              align="center"
-              className={classes.name}
-            >
-              {userName}
-            </Typography>
+              <Typography
+                variant="h6"
+                color="textPrimary"
+                align="center"
+                className={classes.greeting}
+              >
+                Hey there,&nbsp;
+              </Typography>
+              <Typography
+                variant="h6"
+                color="textPrimary"
+                align="center"
+                className={classes.name}
+              >
+                {userName}
+              </Typography>
+            </div>
           </>
         }
         actions={

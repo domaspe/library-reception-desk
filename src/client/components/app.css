@@ -43,3 +43,31 @@ body {
 .switch-wrapper > div {
   position: absolute;
 }
+
+.username-overlay-enter {
+  opacity: 1;
+  background-color: white;
+  position: absolute;
+  top: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+  right: -9999px;
+  z-index: 2998;
+}
+
+.username-overlay-exit {
+  opacity: 0;
+  pointer-events: none;
+  transition: all 300ms;
+}
+
+.username-enter {
+  display: flex;
+  z-index: 2999;
+  transform: translateY(20vh) scale(3);
+}
+
+.username-exit {
+  transform: translateY(0) scale(1);
+  transition: all 300ms;
+}

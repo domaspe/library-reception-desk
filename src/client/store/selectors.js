@@ -15,8 +15,9 @@ import {
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
   PATH_HELP,
-  MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS,
-  MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
+  MAX_CONSECUTIVE_FAILED_MATCH_ATTEMPTS,
+  MAX_CONSECUTIVE_FAILED_DETECT_ATTEMPTS,
+  MIN_CONSECUTIVE_MATCHES
 } from '../constants';
 
 const selectFaceState = state => state.face;
@@ -67,17 +68,15 @@ export function selectIsFaceDetected(state) {
 }
 
 export function selectFaceCannotBeMatched(state) {
-  return (
-    selectFaceMatchState(state).consecutiveFails >
-    MAX_CONSECUTIVER_FAILED_MATCH_ATTEMPTS
-  );
+  return selectFaceMatchState(state).consecutiveFails > MAX_CONSECUTIVE_FAILED_MATCH_ATTEMPTS;
 }
 
 export function selectFaceMissingForHistory(state) {
-  return (
-    selectFaceHistoryState(state).consecutiveFails >
-    MAX_CONSECUTIVER_FAILED_DETECT_ATTEMPTS
-  );
+  return selectFaceHistoryState(state).consecutiveFails > MAX_CONSECUTIVE_FAILED_DETECT_ATTEMPTS;
+}
+
+export function selectIsEnoughConsecutiveMatchSuccesses(state) {
+  return selectFaceMatchState(state).consecutiveSuccess >= MIN_CONSECUTIVE_MATCHES;
 }
 
 export function selectQrCode(state) {
@@ -135,17 +134,13 @@ export function selectClasses(state) {
 
 export function selectNotifyAssignItemSuccess(state) {
   const itemsState = selectItemsState(state);
-  return (
-    itemsState.status === ASSIGN_ITEM_SUCCESS &&
-    Date.now() - itemsState.timestamp < 1000
-  );
+  return itemsState.status === ASSIGN_ITEM_SUCCESS && Date.now() - itemsState.timestamp < 1000;
 }
 
 export const selectUserItems = createSelector(
   selectItemsStateItemsSortedByTime,
   selectActiveUserId,
-  (items, userId) =>
-    items.filter(item => String(item.takenByUserId) === String(userId))
+  (items, userId) => items.filter(item => String(item.takenByUserId) === String(userId))
 );
 
 export const selectFreeItems = createSelector(

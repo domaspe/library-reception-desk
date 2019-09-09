@@ -1,12 +1,13 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
+import { connect } from 'react-redux';
 import Layout from '../common/Layout';
-import HelpOptions from '../common/HelpOptions';
+import * as actions from '../../store/actions';
+import CloseButton from '../common/CloseButton';
 
-const HelpPage = () => {
+const HelpPage = ({ onClose }) => {
   return (
     <Layout
-      actions={<HelpOptions />}
       iconSrc="/assets/faceid-sad.svg"
       titleComponent={
         <Typography variant="h6" color="textPrimary" align="center">
@@ -14,6 +15,7 @@ const HelpPage = () => {
         </Typography>
       }
     >
+      <CloseButton onClick={onClose} />
       <Typography color="textPrimary">
         This could be for a number of reasons, here are a few:
       </Typography>
@@ -39,4 +41,11 @@ const HelpPage = () => {
   );
 };
 
-export default HelpPage;
+const mapDispatchToProps = {
+  onClose: actions.startScanningFaces
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(HelpPage);

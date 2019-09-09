@@ -12,7 +12,7 @@ export function __displayQrTimeStats(stats) {
 export function __displayFaceTimeStats(stats) {
   if (faceEl && stats) {
     // prettier-ignore
-    faceEl.innerHTML = `face detect: ${stats.detect}; match: ${stats.match}`;
+    faceEl.innerHTML = `Detect: ${stats.detect}; Match: ${stats.match}`;
   }
 }
 

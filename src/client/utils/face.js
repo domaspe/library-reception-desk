@@ -7,21 +7,24 @@ const TINY_FACE_DETECTOR = 'tiny_face_detector';
 // eslint-disable-next-line no-unused-vars
 const MTCNN = 'mtcnn';
 
-const selectedFaceDetector = TINY_FACE_DETECTOR;
+const selectedFaceDetector = SSD_MOBILENETV1;
 const faceDetectionNet = faceapi.nets.tinyFaceDetector;
 
-const minConfidence = 0.5;
+// SsdMobilenetv1Options
+const minConfidence = 0.9;
+const maxResults = 1;
+const distanceThreshold = 0.45;
 
-// tiny_face_detector options
+// TinyFaceDetectorOptions
 const inputSize = 512; // divisible by 32
 const scoreThreshold = 0.5;
 
-// mtcnn options
+// MtcnnOptions
 const minFaceSize = 20;
 
 function getFaceDetectorOptions() {
   if (selectedFaceDetector === SSD_MOBILENETV1) {
-    return new faceapi.SsdMobilenetv1Options({ minConfidence });
+    return new faceapi.SsdMobilenetv1Options({ minConfidence, maxResults });
   }
 
   if (selectedFaceDetector === TINY_FACE_DETECTOR) {
@@ -35,15 +38,15 @@ export async function loadModels() {
   faceDetectionNet.loadFromUri('/weights');
   faceapi.nets.faceLandmark68Net.loadFromUri('/weights');
   faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
-
-  console.log('Backend: ', faceapi.tf.getBackend());
+  faceapi.nets.ssdMobilenetv1.loadFromUri('/weights');
 }
 
 export function isFaceDetectionModelLoaded() {
   return (
     !!faceDetectionNet.params &&
     !!faceapi.nets.faceLandmark68Net.params &&
-    !!faceapi.nets.faceRecognitionNet.params
+    !!faceapi.nets.faceRecognitionNet.params &&
+    !!faceapi.nets.ssdMobilenetv1.params
   );
 }
 
@@ -93,7 +96,7 @@ function drawDetection(canvasEl, videoEl, result) {
 
 function findMatchingFace(descriptor) {
   try {
-    const result = faceMatcher && faceMatcher.findBestMatch(descriptor);
+    const result = faceMatcher && faceMatcher.findBestMatch(descriptor, distanceThreshold);
     if (result && result.label !== 'unknown') {
       return result;
     }
@@ -138,16 +141,15 @@ export async function scan() {
 
   let match = null;
   if (detection) {
-    debug.detect += ` (${detection.detection.score.toPrecision(2)})`;
+    debug.detect += `(${detection.detection.score.toPrecision(2)})`;
 
     const matchStart = Date.now();
     match = findMatchingFace(detection.descriptor);
     debug.match = '';
     if (match) {
       const matchStats = getTimeStats('faceMatch', Date.now() - matchStart);
-      debug.match = `${matchStats.time}ms ${
-        matchStats.fps
-      }fps ${match.toString()}`;
+      debug.match = `${matchStats.time}ms ${matchStats.fps}fps; ${match.toString()}`;
+      console.log('Face match', match, matchStats);
     }
     drawDetection(canvas, video, detection);
   }

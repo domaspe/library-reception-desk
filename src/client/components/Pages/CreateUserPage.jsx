@@ -88,11 +88,16 @@ const CreateUserPage = ({
         }
       }
 
-      setStep(newStep);
-
-      if (newStep === 2) {
-        onSaveFace(name, saveFace);
+      if (newStep === 2 && !saveFace) {
+        onSaveFace(name, false);
+        return;
       }
+
+      if (newStep === 3) {
+        onSaveFace(name, true);
+      }
+
+      setStep(newStep);
     },
     [name, saveFace, users]
   );
@@ -130,7 +135,7 @@ const CreateUserPage = ({
                 Close
               </Button>
             )}
-            {step === 1 && (
+            {(step === 1 || step === 2) && (
               <Button
                 variant="contained"
                 color="primary"
@@ -153,6 +158,17 @@ const CreateUserPage = ({
                 <NavigateNextIcon className={classes.rightIcon} />
               </Button>
             )}
+            {step === 2 && (
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                className={classes.button}
+              >
+                Ready
+                <NavigateNextIcon className={classes.rightIcon} />
+              </Button>
+            )}
           </>
         }
       >
@@ -166,6 +182,9 @@ const CreateUserPage = ({
                 <StepLabel />
               </Step>
               <Step completed={step > 2}>
+                <StepLabel />
+              </Step>
+              <Step completed={step > 3}>
                 <StepLabel />
               </Step>
             </Stepper>
@@ -229,7 +248,16 @@ const CreateUserPage = ({
                 />
               </div>
             )}
-            {step === 2 && !isSendingData && (
+            {step === 2 && (
+              <div className={classes.inputContainer}>
+                <Typography color="textPrimary" gutterBottom>
+                  In the next step we will read your face data. You will need to
+                  look straight at the camera. Press "Ready" when you are ready
+                  for the face scan.
+                </Typography>
+              </div>
+            )}
+            {step === 3 && !isSendingData && (
               <div className={classes.inputContainer}>
                 <Typography color="textPrimary" gutterBottom>
                   Look at the camera. Face scan is in progress...
@@ -241,7 +269,7 @@ const CreateUserPage = ({
                 />
               </div>
             )}
-            {step === 2 && isSendingData && (
+            {step === 3 && isSendingData && (
               <div className={classes.inputContainer}>
                 <CircularProgress className={classes.progress} />
               </div>

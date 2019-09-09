@@ -45,14 +45,10 @@ import {
   PATH_HELP
 } from '../../constants';
 import QrWorker from '../../utils/qr.worker';
-import {
-  __displayFaceTimeStats,
-  __displayQrTimeStats
-} from '../../utils/displayTimeStats';
+import { __displayFaceTimeStats, __displayQrTimeStats } from '../../utils/displayTimeStats';
 
 const moduleCreateTime = moment();
-const animationFrame = () =>
-  new Promise(resolve => requestAnimationFrame(resolve));
+const animationFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
 
 let callNextDetectionFail = false;
 function* performFaceScan() {
@@ -78,10 +74,12 @@ function* performFaceScan() {
   }
 
   if (!isReadingFace && isFaceMatched) {
-    // Check if we are still in face scan page.
+    // Check if we are still in face scan page or hibernate page
     // This prevents race condition, when user clicks on some other page, but we still redirect him to session
-    if (yield select(selectIsFaceScanPage)) {
-      yield put(actions.faceMatchSuccess(result.match.label));
+    const faceScanPage = yield select(selectIsFaceScanPage);
+    const hibernatePage = yield select(selectIsHibernatedPage);
+    if (faceScanPage || hibernatePage) {
+      yield put(actions.faceMatchSuccess(result.match.label, result.match.distance));
     }
   }
 
@@ -191,10 +189,7 @@ function* scanQrWorker() {
     if (isSessionPage || isFaceScanPage) {
       yield call(animationFrame);
     } else {
-      yield race([
-        call(waitFor, selectIsSessionPage),
-        call(waitFor, selectIsFaceScanPage)
-      ]);
+      yield race([call(waitFor, selectIsSessionPage), call(waitFor, selectIsFaceScanPage)]);
     }
   }
 }

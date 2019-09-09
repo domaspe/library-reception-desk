@@ -20,7 +20,8 @@ import {
   selectIsFaceScanPage,
   selectIsSessionPage,
   selectIsNotRecognizedPage,
-  selectIsHelpPage
+  selectIsHelpPage,
+  selectIsEnoughConsecutiveMatchSuccesses
 } from '../selectors';
 import {
   HIBERNATE_TIMEOUT,
@@ -114,7 +115,16 @@ function* startScanningFaces() {
 function* faceMatchSuccess({ label }) {
   if (yield select(selectIsHibernatedPage)) {
     yield delay(500); // a little delay to show nabigation animation
+
+    yield put(actions.startScanningFaces());
+    return;
   }
+
+  const enoughMatches = yield select(selectIsEnoughConsecutiveMatchSuccesses);
+  if (!enoughMatches) {
+    return;
+  }
+
   const userId = Number(label);
   yield put(actions.startSession(userId));
 }
@@ -163,11 +173,7 @@ function* locationChange() {
   }
 
   if (yield select(selectIsNotRecognizedPage)) {
-    yield call(
-      waitForInactivity,
-      HIBERNATE_TIMEOUT,
-      actions.startScanningFaces()
-    );
+    yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
     return;
   }
 
@@ -181,11 +187,7 @@ function* locationChange() {
   }
 
   if (yield select(selectIsHelpPage)) {
-    yield call(
-      waitForInactivity,
-      HIBERNATE_TIMEOUT,
-      actions.startScanningFaces()
-    );
+    yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
   }
 }
 

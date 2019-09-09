@@ -91,7 +91,7 @@ const ItemsDrawer = ({
 
 ItemsDrawer.propTypes = {
   assignItem: PropTypes.func.isRequired,
-  selectFilteredItems: PropTypes.array.isRequired,
+  selectFilteredItems: PropTypes.func.isRequired,
   setDrawerOpen: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired
 };
