@@ -6,12 +6,7 @@ import Icon from './Icon';
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    margin: '0 auto',
-    marginTop: theme.spacing(2)
-  },
-  iconSmall: {
-    height: 40,
-    width: 40
+    margin: '0 auto'
   },
   container: {
     display: 'flex',
@@ -63,9 +58,7 @@ const Layout = ({
         />
       )}
       {titleComponent && <div className={classes.box}>{titleComponent}</div>}
-      {children && (
-        <div className={`${classes.box} ${classes.children}`}>{children}</div>
-      )}
+      {children && <div className={`${classes.box} ${classes.children}`}>{children}</div>}
       {actions && <div className={classes.box}>{actions}</div>}
     </div>
   );

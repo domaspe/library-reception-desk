@@ -24,15 +24,16 @@ import {
   PATH_SESSION,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP
+  PATH_HELP,
+  PATH_NOTIFY
 } from '../constants';
 import CreateUserPage from './pages/CreateUserPage';
 import { theme } from '../utils/theme';
-import Test from './common/Test';
-import ItemsDrawer from './common/ItemsDrawer';
-import ItemDrawerButton from './common/ItemDrawerButton';
+import Drawer from './common/Drawer';
+import DrawerButton from './common/DrawerButton';
 
 import './app.css';
+import NotifyPage from './pages/NotifyPage';
 
 function mapStyles(styles) {
   return {
@@ -53,7 +54,13 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: 0,
     left: 0,
-    zIndex: 99999
+    zIndex: 999
+  },
+  logoutButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 999
   }
 }));
 
@@ -61,6 +68,14 @@ const App = ({ appInit }) => {
   const classes = useStyles();
   React.useEffect(() => {
     appInit();
+
+    const timeout = setTimeout(() => {
+      location.reload(true);
+    }, 1000 * 60 * 30 /* 0.5h */);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   });
 
   return (
@@ -69,9 +84,9 @@ const App = ({ appInit }) => {
       <CssBaseline />
       <HiddenCamera />
       <ThemeProvider theme={theme}>
-        <ItemsDrawer />
+        <Drawer />
         <div className={classes.logButton}>
-          <ItemDrawerButton />
+          <DrawerButton />
         </div>
         <Box
           display="flex"
@@ -95,6 +110,7 @@ const App = ({ appInit }) => {
               <Route path={PATH_NOT_RECOGNIZED} component={NotRecognizedPage} />
               <Route path={PATH_CREATE_USER} component={CreateUserPage} />
               <Route path={PATH_HELP} component={HelpPage} />
+              <Route path={PATH_NOTIFY} component={NotifyPage} />
             </AnimatedSwitch>
           </ConnectedRouter>
         </Box>

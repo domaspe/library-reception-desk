@@ -7,7 +7,6 @@ import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import throttle from 'lodash.throttle';
-import { usePrevious } from '../../utils/hooks';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchField = ({ onChange, open }) => {
+const SearchField = ({ onChange, visible }) => {
   const classes = useStyles();
   const [value, setValue] = useState('');
   const onChangeThrottled = useCallback(throttle(onChange, 500));
@@ -41,12 +40,12 @@ const SearchField = ({ onChange, open }) => {
     },
     [onChange]
   );
-  const nextOpen = usePrevious(open);
+
   useEffect(() => {
-    if (!nextOpen && open) {
+    if (visible) {
       clearSearch();
     }
-  }, [nextOpen, open]);
+  }, [visible]);
 
   return (
     <Paper className={classes.root}>
@@ -65,11 +64,11 @@ const SearchField = ({ onChange, open }) => {
 
 SearchField.propTypes = {
   onChange: PropTypes.func.isRequired,
-  open: PropTypes.bool
+  visible: PropTypes.bool
 };
 
 SearchField.defaultProps = {
-  open: true
+  visible: true
 };
 
 export default SearchField;

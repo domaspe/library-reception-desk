@@ -8,6 +8,8 @@ import items from './items';
 import users from './users';
 import activeUser from './activeUser';
 import itemsDrawer from './itemsDrawer';
+import notify from './notify';
+import statistics from './statistics';
 
 import history from '../../utils/history';
 
@@ -20,5 +22,7 @@ export default combineReducers({
   items,
   users,
   activeUser,
-  itemsDrawer
+  itemsDrawer,
+  notify,
+  statistics
 });

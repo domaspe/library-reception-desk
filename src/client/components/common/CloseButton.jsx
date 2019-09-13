@@ -17,7 +17,7 @@ const CloseButton = ({ onClick }) => {
   const classes = useStyles();
   return (
     <IconButton className={classes.close} size="medium" color="primary" onClick={onClick}>
-      <CloseIcon />
+      <CloseIcon fontSize="large" />
     </IconButton>
   );
 };

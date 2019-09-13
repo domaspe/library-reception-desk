@@ -1,22 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions';
+import Video from './common/Video';
 
 const HiddenCamera = ({ scanStart }) => {
-  const videoRef = React.useRef();
   const faceCanvasRef = React.useRef();
   const qrCanvasRef = React.useRef();
 
-  React.useEffect(() => {
-    if (navigator.mediaDevices && videoRef.current) {
-      navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      });
-    }
-  }, [videoRef]);
-
-  const start = React.useCallback(() => {
+  const start = React.useCallback(videoRef => {
     console.log('Start video');
 
     scanStart({
@@ -29,25 +20,16 @@ const HiddenCamera = ({ scanStart }) => {
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
-      className="smart-camera-container hidden"
+      className="video-container hidden"
       onClick={evt => {
         if (evt.detail === 4) {
-          document
-            .getElementsByClassName('smart-camera-container')[0]
-            .classList.toggle('hidden');
+          document.getElementsByClassName('video-container')[0].classList.toggle('hidden');
         }
       }}
     >
-      <video
-        ref={videoRef}
-        onLoadedMetadata={start}
-        autoPlay
-        muted
-        width="640"
-        height="480"
-      />
-      <canvas ref={faceCanvasRef} className="smart-camera-overlay" />
-      <canvas ref={qrCanvasRef} className="smart-camera-overlay" />
+      <Video onLoadedMetadata={start} width="640" height="480" />
+      <canvas ref={faceCanvasRef} className="video-overlay" />
+      <canvas ref={qrCanvasRef} className="video-overlay" />
     </div>
   );
 };

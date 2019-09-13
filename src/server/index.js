@@ -20,13 +20,18 @@ app.use(express.static('dist'));
 app.use('/weights', express.static(path.join(rootDir, 'weights')));
 app.use('/assets', express.static(path.join(rootDir, 'assets')));
 
-app.get('/api/getUsername', (req, res) =>
-  res.send({ username: os.userInfo().username })
-);
+app.get('/api/getUsername', (req, res) => res.send({ username: os.userInfo().username }));
 
 app.get('/api/test', (req, res) => {
   db.getItems().then(users => console.log('>>> users', users));
   return res.sendStatus(200);
+});
+
+app.get('/api/statistics', (req, res, next) => {
+  return handlers
+    .getStatistics()
+    .then(items => res.json(items))
+    .catch(next);
 });
 
 app.get('/api/users', (req, res, next) => {

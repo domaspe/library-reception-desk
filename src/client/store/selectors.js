@@ -5,7 +5,8 @@ import {
   FACE_DETECT_SUCCESS,
   LOAD_USERS,
   ASSIGN_ITEM_SUCCESS,
-  UPDATE_USER
+  UPDATE_USER,
+  LOAD_STATISTICS
 } from './actions';
 import {
   DESCRIPTORS_PER_CLASS,
@@ -17,7 +18,8 @@ import {
   PATH_HELP,
   MAX_CONSECUTIVE_FAILED_MATCH_ATTEMPTS,
   MAX_CONSECUTIVE_FAILED_DETECT_ATTEMPTS,
-  MIN_CONSECUTIVE_MATCHES
+  MIN_CONSECUTIVE_MATCHES,
+  PATH_NOTIFY
 } from '../constants';
 
 const selectFaceState = state => state.face;
@@ -28,6 +30,7 @@ const selectItemsState = state => state.items;
 const selectUsersState = state => state.users;
 const selectActiveUserState = state => state.activeUser;
 const selectRouterState = state => state.router;
+const selectStatisticsState = state => state.statistics;
 
 const sortByKey = key => (a, b) => (a[key] > b[key] ? 1 : -1);
 const sortByTime = key => (a, b) => new Date(b[key]) - new Date(a[key]);
@@ -148,6 +151,11 @@ export const selectFreeItems = createSelector(
   items => items.filter(item => !item.timeTaken)
 );
 
+export const selectTakenItems = createSelector(
+  selectItemsStateItemsSortedByTitle,
+  items => items.filter(item => item.timeTaken)
+);
+
 const selectFilteredItems = (filterPhrase, items) => {
   const filter = filterPhrase.trim().toLowerCase();
   if (!filter || filter.length < 2) {
@@ -167,11 +175,11 @@ export const createFreeItemsFilterSelector = createSelector(
   freeItems => filter => selectFilteredItems(filter, freeItems)
 );
 
-export const createAllItemsFilterSelector = createSelector(
-  selectItemsStateItemsSortedByTitle,
+export const createTakenItemsFilterSelector = createSelector(
+  selectTakenItems,
   items => {
     return filter => {
-      return selectFilteredItems(filter, items); // : items.sort(sortByKey('stringified'))
+      return selectFilteredItems(filter, items);
     };
   }
 );
@@ -206,6 +214,31 @@ export function selectIsHelpPage(state) {
   return !!matchPath(selectPathname(state), { path: PATH_HELP });
 }
 
+export function selectIsNotifyPage(state) {
+  return !!matchPath(selectPathname(state), { path: PATH_NOTIFY });
+}
+
+export function selectIsNotifyMessage(state) {
+  return state.notify.message;
+}
+
 export function selectIsItemsDrawerOpen(state) {
   return state.itemsDrawer.open;
+}
+
+export function selectIsLoadStatisticsInProgress(state) {
+  const { status } = selectStatisticsState(state);
+  return status === LOAD_STATISTICS || !status;
+}
+
+export function selectMostPopularItems(state) {
+  return selectStatisticsState(state).mostPopularItems;
+}
+
+export function selectMostUnpopularItems(state) {
+  return selectStatisticsState(state).mostUnpopularItems;
+}
+
+export function selectMostActiveUsers(state) {
+  return selectStatisticsState(state).mostActiveUsers;
 }

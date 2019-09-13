@@ -31,6 +31,9 @@ export const INITIALIZE_SCANNERS = 'INITIALIZE_SCANNERS';
 
 export const TRY_ASSIGN_ITEM = 'TRY_ASSIGN_ITEM';
 
+export const LOAD_STATISTICS = 'LOAD_STATISTICS';
+export const LOAD_STATISTICS_SUCCESS = 'LOAD_STATISTICS_SUCCESS';
+
 export const START_SESSION = 'START_SESSION';
 export const END_SESSION = 'END_SESSION';
 export const START_SCANNING_FACES = 'START_SCANNING_FACES';
@@ -40,6 +43,7 @@ export const CREATE_USER = 'CREATE_USER';
 export const HELP = 'HELP';
 export const SET_ITEMS_DRAWER_STATE = 'SET_ITEMS_DRAWER_STATE';
 
+export const NOTIFY = 'NOTIFY';
 export const ERROR = 'ERROR';
 
 export function appInit() {
@@ -192,7 +196,7 @@ export function closeUserPicker() {
 export function tryAssignItem(itemId, userId = null) {
   return {
     type: TRY_ASSIGN_ITEM,
-    itemId,
+    itemId: Number(itemId),
     userId
   };
 }
@@ -254,6 +258,21 @@ export function help() {
   };
 }
 
+export function loadStatistics() {
+  return {
+    type: LOAD_STATISTICS
+  };
+}
+
+export function loadStatisticsSuccess(mostPopularItems, mostUnpopularItems, mostActiveUsers) {
+  return {
+    type: LOAD_STATISTICS_SUCCESS,
+    mostPopularItems,
+    mostUnpopularItems,
+    mostActiveUsers
+  };
+}
+
 export function setItemsDrawerOpen(open) {
   return {
     type: SET_ITEMS_DRAWER_STATE,
@@ -264,6 +283,13 @@ export function setItemsDrawerOpen(open) {
 export function error(message) {
   return {
     type: ERROR,
+    message
+  };
+}
+
+export function notify(message) {
+  return {
+    type: NOTIFY,
     message
   };
 }

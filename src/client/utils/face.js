@@ -71,13 +71,6 @@ async function detectSingleFace(videoEl, canvasEl) {
     return null;
   }
 
-  // try {
-
-  //   const dims = faceapi.matchDimensions(canvasEl, videoEl, false);
-  //   faceapi.draw.drawDetections(canvasEl, faceapi.resizeResults(result, dims));
-  //   // eslint-disable-next-line no-empty
-  // } catch (err) {}
-
   return result;
 }
 
@@ -149,7 +142,6 @@ export async function scan() {
     if (match) {
       const matchStats = getTimeStats('faceMatch', Date.now() - matchStart);
       debug.match = `${matchStats.time}ms ${matchStats.fps}fps; ${match.toString()}`;
-      console.log('Face match', match, matchStats);
     }
     drawDetection(canvas, video, detection);
   }

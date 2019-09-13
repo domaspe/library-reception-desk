@@ -1,14 +1,11 @@
 import React, { useCallback } from 'react';
-import { Fab, Fade } from '@material-ui/core';
-import { List as ListIcon } from '@material-ui/icons';
+import { Fade, IconButton } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import MenuIcon from '@material-ui/icons/Menu';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as actions from '../../store/actions';
-import {
-  selectIsItemsDrawerOpen,
-  selectIsHibernatedPage
-} from '../../store/selectors';
+import { selectIsItemsDrawerOpen, selectIsHibernatedPage } from '../../store/selectors';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -16,21 +13,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ItemDrawerButton = ({ show, setDrawerOpen }) => {
+const DrawerButton = ({ show, setDrawerOpen }) => {
   const classes = useStyles();
   return (
     <Fade in={show}>
-      <Fab
-        className={classes.button}
-        onClick={useCallback(() => setDrawerOpen(true))}
-      >
-        <ListIcon />
-      </Fab>
+      <IconButton className={classes.button} onClick={useCallback(() => setDrawerOpen(true))}>
+        <MenuIcon fontSize="large" />
+      </IconButton>
     </Fade>
   );
 };
 
-ItemDrawerButton.propTypes = {
+DrawerButton.propTypes = {
   setDrawerOpen: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired
 };
@@ -48,4 +42,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ItemDrawerButton);
+)(DrawerButton);

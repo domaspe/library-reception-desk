@@ -1,15 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  Typography,
-  IconButton,
-  Paper,
-  Box,
-  Fade,
-  Grow
-} from '@material-ui/core';
+import { Typography, IconButton, Paper, Box, Fade, Grow } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import CloseIcon from '@material-ui/icons/Close';
+import RemoveIcon from '@material-ui/icons/Remove';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
@@ -17,7 +10,7 @@ import List from 'react-virtualized/dist/commonjs/List';
 
 const useStyles = makeStyles(theme => ({
   listContainer: {
-    height: '50vh',
+    height: '65vh',
     width: '100%',
     display: 'flex'
   },
@@ -77,13 +70,7 @@ function createTitle({ primaryTitle, secondaryTitle, description }) {
     .join('\n');
 }
 
-const ItemList = ({
-  onItemClick,
-  items,
-  showAdd,
-  height: componentHeight,
-  animate
-}) => {
+const ItemList = ({ onItemClick, items, showAdd, height: componentHeight, animate }) => {
   const classes = useStyles();
   const [outId, setOutId] = useState(null);
   useEffect(() => {
@@ -115,9 +102,7 @@ const ItemList = ({
               <Box
                 className={classes.thumbnail}
                 style={{
-                  backgroundImage: item.thumbnailUrl
-                    ? `url("${item.thumbnailUrl}")`
-                    : undefined
+                  backgroundImage: item.thumbnailUrl ? `url("${item.thumbnailUrl}")` : undefined
                 }}
               />
             </div>
@@ -138,19 +123,13 @@ const ItemList = ({
               )}
             </div>
             {showAdd && (
-              <IconButton
-                color="primary"
-                onClick={() => handleItemClick(item.id)}
-              >
-                <AddIcon />
+              <IconButton color="primary" onClick={() => handleItemClick(item.id)}>
+                <AddIcon fontSize="large" />
               </IconButton>
             )}
             {!showAdd && !!item.timeTaken && (
-              <IconButton
-                color="primary"
-                onClick={() => handleItemClick(item.id)}
-              >
-                <CloseIcon />
+              <IconButton color="primary" onClick={() => handleItemClick(item.id)}>
+                <RemoveIcon fontSize="large" />
               </IconButton>
             )}
           </div>
@@ -176,8 +155,8 @@ const ItemList = ({
   };
 
   const emptyRenderer = () => (
-    <Fade in={!items.length}>
-      <Box p={2} style={{ width: '100%' }}>
+    <Fade in={!items.length} style={{ height: '100%' }}>
+      <Box p={2} style={{ width: '100%', height: '100%', display: 'flex' }}>
         <Typography
           color="textPrimary"
           align="center"

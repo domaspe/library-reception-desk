@@ -1,13 +1,6 @@
 import React, { useCallback, memo, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Button,
-  Typography,
-  Tabs,
-  Tab,
-  AppBar,
-  Badge
-} from '@material-ui/core';
+import { Typography, Tabs, Tab, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import SwipeableViews from 'react-swipeable-views';
@@ -24,6 +17,7 @@ import Layout from '../common/Layout';
 import { useIconAnimation, useSearchFilter } from '../../utils/hooks';
 import ItemList from '../common/ItemList';
 import SearchField from '../common/SearchField';
+import CloseButton from '../common/CloseButton';
 
 const useStyles = makeStyles(theme => ({
   username: {
@@ -60,8 +54,7 @@ const useStyles = makeStyles(theme => ({
 
 function areEqual(prevProps, nextProps) {
   return (
-    shallowequal(prevProps, nextProps) ||
-    (prevProps.userId && !nextProps.userId) // do not render on logout while route transition is in progress
+    shallowequal(prevProps, nextProps) || (prevProps.userId && !nextProps.userId) // do not render on logout while route transition is in progress
   );
 }
 
@@ -76,23 +69,15 @@ const SessionPage = memo(
     assignItem
   }) => {
     const classes = useStyles();
-    const [animateIcon, onIconAnimationEnd] = useIconAnimation(
-      assignItemSuccess
-    );
+    const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
     const [tab, setTab] = useState(0);
     const handleTabChange = (event, newValue) => setTab(newValue);
     const handleSwipeChange = index => setTab(index);
 
-    const handleAddItemClick = useCallback(itemId =>
-      assignItem(itemId, userId)
-    );
-    const handlRemoveItemClick = useCallback(itemId =>
-      assignItem(itemId, null)
-    );
+    const handleAddItemClick = useCallback(itemId => assignItem(itemId, userId));
+    const handlRemoveItemClick = useCallback(itemId => assignItem(itemId, null));
 
-    const [freeItems, handleFilterChange] = useSearchFilter(
-      selectFilteredFreeItems
-    );
+    const [freeItems, handleFilterChange] = useSearchFilter(selectFilteredFreeItems);
 
     const [animateUser, setAnimateUser] = useState(false);
     useEffect(() => {
@@ -125,25 +110,14 @@ const SessionPage = memo(
               >
                 Hey there,&nbsp;
               </Typography>
-              <Typography
-                variant="h6"
-                color="textPrimary"
-                align="center"
-                className={classes.name}
-              >
+              <Typography variant="h6" color="textPrimary" align="center" className={classes.name}>
                 {userName}
               </Typography>
             </div>
           </>
         }
-        actions={
-          <>
-            <Button color="primary" onClick={onLogout}>
-              End session
-            </Button>
-          </>
-        }
       >
+        <CloseButton onClick={onLogout} />
         <AppBar position="relative" color="default">
           <Tabs
             value={tab}
@@ -153,21 +127,7 @@ const SessionPage = memo(
             textColor="primary"
             className={classes.tabs}
           >
-            <Tab
-              label={
-                userItems.length > 0 ? (
-                  <Badge
-                    className={classes.badge}
-                    color="primary"
-                    badgeContent={userItems.length}
-                  >
-                    Your items
-                  </Badge>
-                ) : (
-                  'Your items'
-                )
-              }
-            />
+            <Tab label={`Your items${userItems.length > 0 ? ` (${userItems.length})` : ''}`} />
             <Tab label="Add items manually" />
           </Tabs>
         </AppBar>
@@ -179,40 +139,24 @@ const SessionPage = memo(
         >
           <>
             <div className={classes.tabTop}>
-              <Typography
-                color="textPrimary"
-                align="center"
-                gutterBottom
-                variant="body2"
-              >
-                Below are the devices that you’ve taken out. If you want to
-                take/return a device, face the QR code on the back of the device
-                towards the camera.
+              <Typography color="textPrimary" gutterBottom variant="body2">
+                Below are the devices that you’ve taken out. If you want to take/return a device,
+                face the QR code on the back of the device towards the camera.
               </Typography>
             </div>
             <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
           </>
           <>
             <div className={classes.tabTop}>
-              <Typography
-                color="textPrimary"
-                align="center"
-                gutterBottom
-                variant="body2"
-              >
-                Here you can see all items still available. Click on + to
-                reserve the item.
+              <Typography color="textPrimary" gutterBottom variant="body2">
+                Here you can see all items still available. Click on + to reserve the item.
               </Typography>
               <div className={classes.searchContainer}>
                 <SearchField onChange={handleFilterChange} />
               </div>
             </div>
             <div className={classes.tabContent}>
-              <ItemList
-                items={freeItems}
-                onItemClick={handleAddItemClick}
-                showAdd
-              />
+              <ItemList items={freeItems} onItemClick={handleAddItemClick} showAdd />
             </div>
           </>
         </SwipeableViews>

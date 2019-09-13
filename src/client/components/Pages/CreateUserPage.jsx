@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -16,13 +16,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  Zoom
 } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import * as selectors from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Layout from '../common/Layout';
+import CloseButton from '../common/CloseButton';
+import Video from '../common/Video';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -52,30 +55,50 @@ const useStyles = makeStyles(theme => ({
   stepper: {
     marginBottom: theme.spacing(4)
   },
+  faceScanProgressContainer: {
+    position: 'relative',
+    marginBottom: theme.spacing(2),
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  video: {
+    width: 100,
+    height: 100,
+    filter: 'sepia(1) hue-rotate(314deg) saturate(2) contrast(7)',
+    borderRadius: 50,
+    objectFit: 'cover'
+  },
+  countdown: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 0,
+    left: 0,
+    color: theme.palette.primary.main,
+    textShadow: '-1px 0 white, 0 1px white, 1px 0 white, 0 -1px white'
+  },
   progress: {
-    marginTop: theme.spacing(2)
+    position: 'absolute',
+    top: -9,
+    left: -9
   }
 }));
 
-const CreateUserPage = ({
-  users,
-  progress,
-  onSaveFace,
-  onCancel,
-  isSendingData
-}) => {
+const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }) => {
   const classes = useStyles();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [saveFace, setSaveFace] = useState(true);
   const [showUserExists, setShowUserExists] = useState(false);
+  const [cameraCountdown, setCameraCountdown] = useState(3);
 
   const handleNameChange = useCallback(event => {
     setName(event.target.value.trim());
   });
-  const handleSaveFaceChange = useCallback(event =>
-    setSaveFace(!!event.target.checked)
-  );
+  const handleSaveFaceChange = useCallback(event => setSaveFace(!!event.target.checked));
   const handleUserExistsCancel = useCallback(() => setShowUserExists(false));
 
   const goToNextStep = useCallback(
@@ -91,10 +114,6 @@ const CreateUserPage = ({
       if (newStep === 2 && !saveFace) {
         onSaveFace(name, false);
         return;
-      }
-
-      if (newStep === 3) {
-        onSaveFace(name, true);
       }
 
       setStep(newStep);
@@ -115,6 +134,36 @@ const CreateUserPage = ({
     goToNextStep(step + 1, true);
   }, [step]);
 
+  useEffect(() => {
+    const listener = event => {
+      if (event.key === 'Enter') {
+        goToNextStep(step + 1);
+      }
+    };
+    document.addEventListener('keydown', listener);
+    return () => {
+      document.removeEventListener('keydown', listener);
+    };
+  }, [handleFormSubmit, step]);
+
+  useEffect(() => {
+    if (step === 3 && cameraCountdown > 0) {
+      const timeout = setTimeout(() => {
+        setCameraCountdown(cameraCountdown - 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+
+    if (step === 3 && cameraCountdown === 0) {
+      onSaveFace(name, true);
+    }
+
+    return undefined;
+  }, [step, cameraCountdown]);
+
   return (
     <form autoComplete="off" onSubmit={handleFormSubmit(step + 1)}>
       <Layout
@@ -126,15 +175,6 @@ const CreateUserPage = ({
         }
         actions={
           <>
-            {step === 0 && (
-              <Button
-                color="primary"
-                onClick={onCancel}
-                className={classes.button}
-              >
-                Close
-              </Button>
-            )}
             {(step === 1 || step === 2) && (
               <Button
                 variant="contained"
@@ -148,23 +188,13 @@ const CreateUserPage = ({
               </Button>
             )}
             {step < 2 && (
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                className={classes.button}
-              >
+              <Button variant="contained" color="primary" type="submit" className={classes.button}>
                 Next
                 <NavigateNextIcon className={classes.rightIcon} />
               </Button>
             )}
             {step === 2 && (
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                className={classes.button}
-              >
+              <Button variant="contained" color="primary" type="submit" className={classes.button}>
                 Ready
                 <NavigateNextIcon className={classes.rightIcon} />
               </Button>
@@ -173,6 +203,7 @@ const CreateUserPage = ({
         }
       >
         <>
+          <CloseButton onClick={onCancel} />
           <div className={classes.container}>
             <Stepper activeStep={step} className={classes.stepper}>
               <Step completed={step > 0}>
@@ -209,8 +240,7 @@ const CreateUserPage = ({
                   <DialogTitle>User exists</DialogTitle>
                   <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                      User with the same name already exists. Do you want to
-                      overwrite face data?
+                      User with the same name already exists. Do you want to overwrite face data?
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
@@ -232,8 +262,8 @@ const CreateUserPage = ({
             {step === 1 && (
               <div className={classes.inputContainer}>
                 <Typography color="textPrimary" gutterBottom>
-                  Uncheck the checkbox below if you don't want to save face
-                  data. Note that you won't be able to use face detection.
+                  Uncheck the checkbox below if you don't want to save face data. Note that you
+                  won't be able to use face detection.
                 </Typography>
                 <FormControlLabel
                   control={
@@ -251,27 +281,33 @@ const CreateUserPage = ({
             {step === 2 && (
               <div className={classes.inputContainer}>
                 <Typography color="textPrimary" gutterBottom>
-                  In the next step we will read your face data. You will need to
-                  look straight at the camera. Press "Ready" when you are ready
-                  for the face scan.
+                  In the next step we will read your face data. You will need to look straight at
+                  the camera. Press "Ready" when you are ready for the face scan.
                 </Typography>
               </div>
             )}
-            {step === 3 && !isSendingData && (
+            {step === 3 && (
               <div className={classes.inputContainer}>
+                <div className={classes.faceScanProgressContainer}>
+                  <Video autoPlay muted className={`mirror ${classes.video}`} />
+                  {cameraCountdown ? (
+                    <Zoom key={cameraCountdown} appear in>
+                      <Typography variant="h2" gutterBottom className={classes.countdown}>
+                        {cameraCountdown}
+                      </Typography>
+                    </Zoom>
+                  ) : (
+                    <CircularProgress
+                      variant={isSendingData ? undefined : 'static'}
+                      value={isSendingData ? undefined : progress}
+                      className={classes.progress}
+                      size={118}
+                    />
+                  )}
+                </div>
                 <Typography color="textPrimary" gutterBottom>
-                  Look at the camera. Face scan is in progress...
+                  Face scan is in progress...
                 </Typography>
-                <CircularProgress
-                  variant="static"
-                  value={progress}
-                  className={classes.progress}
-                />
-              </div>
-            )}
-            {step === 3 && isSendingData && (
-              <div className={classes.inputContainer}>
-                <CircularProgress className={classes.progress} />
               </div>
             )}
           </div>
@@ -292,7 +328,7 @@ CreateUserPage.propTypes = {
 const mapStateToProps = state => ({
   progress: selectors.selectFaceDataCollectedPercentage(state),
   users: selectors.selectUsers(state),
-  isSendingData: selectors.selectIsUpdatingUser(state)
+  isSendingData: false // selectors.selectIsUpdatingUser(state)
 });
 
 const mapDispatchToProps = {

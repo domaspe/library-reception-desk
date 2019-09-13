@@ -18,3 +18,4 @@ export const PATH_SESSION = '/session';
 export const PATH_NOT_RECOGNIZED = '/notrecognized';
 export const PATH_CREATE_USER = '/createuser';
 export const PATH_HELP = '/help';
+export const PATH_NOTIFY = '/notify';

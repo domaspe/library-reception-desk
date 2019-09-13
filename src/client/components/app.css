@@ -2,9 +2,9 @@ body {
   overflow: hidden;
 }
 
-.smart-camera-container {
+.video-container {
   position: absolute;
-  top: -388px;
+  bottom: 0;
   right: -256px;
   transform-origin: bottom center;
   transform: scale(-0.2, 0.2);
@@ -12,11 +12,11 @@ body {
   transition: all 300ms !important;
 }
 
-.smart-camera-container.hidden {
+.video-container.hidden {
   opacity: 0;
 }
 
-.smart-camera-overlay {
+.video-overlay {
   position: absolute;
   top: 0;
   left: 0;

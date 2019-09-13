@@ -21,7 +21,8 @@ import {
   selectIsSessionPage,
   selectIsNotRecognizedPage,
   selectIsHelpPage,
-  selectIsEnoughConsecutiveMatchSuccesses
+  selectIsEnoughConsecutiveMatchSuccesses,
+  selectIsNotifyPage
 } from '../selectors';
 import {
   HIBERNATE_TIMEOUT,
@@ -30,7 +31,9 @@ import {
   PATH_SLEEP,
   PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
-  PATH_HELP
+  PATH_HELP,
+  PATH_NOTIFY,
+  TIMEOUT_AFTER_ASSIGN
 } from '../../constants';
 import history from '../../utils/history';
 import loginAudio from '../../../../assets/login.mp3';
@@ -100,7 +103,7 @@ function* waitForInactivity(timeout, action) {
 function* startSession({ userId }) {
   yield put(actions.setActiveUser(userId));
   yield call(loginFx.play);
-  yield call(history.push, PATH_SESSION);
+  yield call(history.replace, PATH_SESSION);
 }
 
 function* endSession() {
@@ -109,7 +112,7 @@ function* endSession() {
 }
 
 function* startScanningFaces() {
-  yield call(history.push, PATH_FACE_SCAN);
+  yield call(history.replace, PATH_FACE_SCAN);
 }
 
 function* faceMatchSuccess({ label }) {
@@ -130,19 +133,23 @@ function* faceMatchSuccess({ label }) {
 }
 
 function* faceNotRecognized() {
-  yield call(history.push, PATH_NOT_RECOGNIZED);
+  yield call(history.replace, PATH_NOT_RECOGNIZED);
 }
 
 function* hibernate() {
-  yield call(history.push, PATH_SLEEP);
+  yield call(history.replace, PATH_SLEEP);
 }
 
 function* createUser() {
-  yield call(history.push, PATH_CREATE_USER);
+  yield call(history.replace, PATH_CREATE_USER);
 }
 
 function* help() {
-  yield call(history.push, PATH_HELP);
+  yield call(history.replace, PATH_HELP);
+}
+
+function* notify() {
+  yield call(history.replace, PATH_NOTIFY);
 }
 
 function* endSessionOnEscape() {
@@ -189,6 +196,11 @@ function* locationChange() {
   if (yield select(selectIsHelpPage)) {
     yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
   }
+
+  if (yield select(selectIsNotifyPage)) {
+    yield delay(TIMEOUT_AFTER_ASSIGN);
+    yield put(actions.startScanningFaces());
+  }
 }
 
 export default function* navigation() {
@@ -203,6 +215,7 @@ export default function* navigation() {
     yield takeLatest(actions.UPDATE_USER_FAIL, faceNotRecognized),
     yield takeLatest(actions.CREATE_USER, createUser),
     yield takeLatest(actions.FACE_MATCH_SUCCESS, faceMatchSuccess),
-    yield takeLatest(actions.HELP, help)
+    yield takeLatest(actions.HELP, help),
+    yield takeLatest(actions.NOTIFY, notify)
   ]);
 }

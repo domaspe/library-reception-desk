@@ -4,6 +4,14 @@ const path = require('path');
 const dataPath = path.join(__dirname, '../../database');
 const pathToDatabase = path.join(dataPath, 'local.sqlite3');
 
+const LOG_TAKE_ITEM = 10;
+const LOG_RETURN_ITEM = 11;
+
+const LOG_CREATE_USER = 20;
+const LOG_CREATE_USER_WITH_FACE = 21;
+const LOG_UPDATE_USER = 22;
+const LOG_UPDATE_USER_WITH_FACE = 23;
+
 const db = new sqlite3.Database(pathToDatabase, err => {
   if (err) {
     console.log('Failed to start database', pathToDatabase, err);
@@ -80,10 +88,7 @@ async function updateUser(id, data) {
 }
 
 function addUser(name, descriptors) {
-  return run('INSERT INTO users (name, descriptors) VALUES(?, ?)', [
-    name,
-    descriptors
-  ]);
+  return run('INSERT INTO users (name, descriptors) VALUES(?, ?)', [name, descriptors]);
 }
 
 function getItems() {
@@ -114,13 +119,66 @@ function updateItem(id, data) {
 }
 
 function log(itemId, userId, action, info) {
-  return run(
-    'INSERT INTO log (userId, itemId, action, info, timestamp) VALUES(?, ?, ?, ?, ?)',
-    [userId, itemId, action, info, Date.now()]
-  );
+  return run('INSERT INTO log (userId, itemId, action, info, timestamp) VALUES(?, ?, ?, ?, ?)', [
+    userId,
+    itemId,
+    action,
+    info,
+    Date.now()
+  ]);
+}
+
+function getmostPopularItems() {
+  return all(
+    `
+    SELECT i.id, i.primaryTitle, i.secondaryTitle, i.description, ifnull(c.timesTaken, 0) as timesTaken
+    FROM items AS i
+    LEFT OUTER JOIN (
+      SELECT itemId, count(*) as timesTaken
+      FROM log WHERE action = ?
+      GROUP BY itemId)  AS c ON i.id = c.itemId
+    ORDER BY c.timesTaken DESC
+    `,
+    [LOG_TAKE_ITEM]
+  ).then(rows => {
+    const top = rows.slice(0, 3);
+
+    let bot = rows.slice(-3);
+    if (bot.every((val, i, arr) => val.timesTaken === arr[0].timesTaken)) {
+      bot = rows.filter(row => row.timesTaken === bot[0].timesTaken);
+    }
+
+    return {
+      top,
+      bot: bot.reverse()
+    };
+  });
+}
+
+function getMostActiveUsers() {
+  return all(
+    `
+    SELECT u.id, u.name, ifnull(c.timesTaken, 0) as timesTaken
+    FROM users AS u
+      LEFT OUTER JOIN (
+        SELECT userId, count(*) as timesTaken
+        FROM log WHERE action = ?
+        GROUP BY userId)  AS c ON u.id = c.userId
+    ORDER BY c.timesTaken DESC
+    `,
+    [LOG_TAKE_ITEM]
+  ).then(rows => {
+    const top = rows.filter(row => row.timesTaken > 0).slice(0, 3);
+
+    return {
+      top
+    };
+  });
 }
 
 module.exports = {
+  getmostPopularItems,
+  getMostActiveUsers,
   getUsers,
   getUser,
   getUserByName,
@@ -129,5 +187,11 @@ module.exports = {
   getItems,
   getItem,
   updateItem,
-  log
+  log,
+  LOG_TAKE_ITEM,
+  LOG_RETURN_ITEM,
+  LOG_CREATE_USER,
+  LOG_CREATE_USER_WITH_FACE,
+  LOG_UPDATE_USER,
+  LOG_UPDATE_USER_WITH_FACE
 };

@@ -20,7 +20,8 @@ export default function items(state = initialState, action) {
         ...state,
         items: action.items.map(item => ({
           ...item,
-          stringified: `${item.primaryTitle} ${item.secondaryTitle}`.toLowerCase()
+          stringified: `${item.primaryTitle} ${item.secondaryTitle}`.toLowerCase(),
+          fullName: `${item.primaryTitle} (${item.secondaryTitle})`
         })),
         status: LOAD_ITEMS_SUCCESS,
         timestamp: Date.now()
