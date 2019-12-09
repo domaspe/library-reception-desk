@@ -7,17 +7,13 @@ const sagaMiddleware = createSagaMiddleware();
 
 // dev tools middleware
 /* eslint-disable no-underscore-dangle */
-const reduxDevTools =
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__();
+const composeEnhancers =
+  process.env.NODE_ENV !== 'production' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : compose;
 /* eslint-enable */
 
-const store = createStore(
-  reducers,
-  compose(
-    applyMiddleware(sagaMiddleware),
-    reduxDevTools
-  )
-);
+const store = createStore(reducers, composeEnhancers(applyMiddleware(sagaMiddleware)));
 
 sagaMiddleware.run(sagas);
 
