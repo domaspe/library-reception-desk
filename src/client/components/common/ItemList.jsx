@@ -12,7 +12,8 @@ const useStyles = makeStyles(theme => ({
   listContainer: {
     height: '65vh',
     width: '100%',
-    display: 'flex'
+    display: 'flex',
+    flex: 1
   },
   list: {
     //    maxHeight: '60vh',

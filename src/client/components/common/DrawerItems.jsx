@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
   header: {
     display: 'flex',
     alignItems: 'center',
-    padding: theme.spacing(2, 2, 0, 2),
+    padding: theme.spacing(2),
     justifyContent: 'flex-end'
   },
   content: {
@@ -62,7 +62,4 @@ const mapDispatchToProps = {
   assignItem: actions.tryAssignItem
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DrawerItems);
+export default connect(mapStateToProps, mapDispatchToProps)(DrawerItems);

@@ -71,3 +71,7 @@ body {
   transform: translateY(0) scale(1);
   transition: all 300ms;
 }
+
+.react-swipeable-view-container {
+  height: 100%;
+}

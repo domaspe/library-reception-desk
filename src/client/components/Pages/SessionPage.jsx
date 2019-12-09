@@ -48,7 +48,9 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(0, 2)
   },
   swipeableSlide: {
-    overflow: 'hidden !important' // Override swipeable style prop
+    overflow: 'hidden !important', // Override swipeable style prop
+    display: 'flex',
+    flexDirection: 'column'
   }
 }));
 
@@ -144,7 +146,7 @@ const SessionPage = memo(
                 face the QR code on the back of the device towards the camera.
               </Typography>
             </div>
-            <ItemList items={userItems} onItemClick={handlRemoveItemClick} />
+            <ItemList items={userItems} onItemClick={handlRemoveItemClick} height="auto" />
           </>
           <>
             <div className={classes.tabTop}>
@@ -193,7 +195,4 @@ const mapDispatchToProps = {
 
 SessionPage.displayName = 'SessionPage';
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SessionPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SessionPage);

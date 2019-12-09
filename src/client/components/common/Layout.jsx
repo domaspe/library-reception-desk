@@ -6,7 +6,8 @@ import Icon from './Icon';
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    margin: '0 auto'
+    margin: '0 auto',
+    minHeight: 60
   },
   container: {
     display: 'flex',
@@ -17,7 +18,8 @@ const useStyles = makeStyles(theme => ({
     minWidth: 400,
     maxWidth: 900,
     margin: '0 auto',
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
+    height: '100vh'
   },
   box: {
     display: 'flex',
