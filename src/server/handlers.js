@@ -51,7 +51,7 @@ function toggleUser(itemId, userId) {
         .then(() => STATUS_UNASSIGN_SUCCESS);
     }
 
-    if (!item.takenByUserId) {
+    if (!item.takenByUserId || (userId && item.takenByUserId !== userId)) {
       return db.getUser(userId).then(user => {
         if (!user) return STATUS_FAIL;
 
