@@ -184,42 +184,50 @@ export function selectSearch(state) {
   return search;
 }
 
-export function selectIsHibernatedPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_SLEEP });
-}
+export const selectIsHibernatedPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_SLEEP })
+);
 
-export function selectIsFaceScanPagePaused(state) {
-  const pathname = selectPathname(state);
-  const search = selectSearch(state);
-  return (
-    search === '?pause' && (!!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/')
-  );
-}
+export const selectIsFaceScanPagePaused = createSelector(
+  selectPathname,
+  selectSearch,
+  (pathname, search) => {
+    return (
+      search === '?pause' && (!!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/')
+    );
+  }
+);
 
-export function selectIsFaceScanPage(state) {
-  const pathname = selectPathname(state);
-  return !!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/';
-}
+export const selectIsFaceScanPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/'
+);
 
-export function selectIsSessionPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_SESSION });
-}
+export const selectIsSessionPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_SESSION })
+);
 
-export function selectIsNotRecognizedPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_NOT_RECOGNIZED });
-}
+export const selectIsNotRecognizedPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_NOT_RECOGNIZED })
+);
 
-export function selectIsCreateUserPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_CREATE_USER });
-}
+export const selectIsCreateUserPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_CREATE_USER })
+);
 
-export function selectIsHelpPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_HELP });
-}
+export const selectIsHelpPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_HELP })
+);
 
-export function selectIsNotifyPage(state) {
-  return !!matchPath(selectPathname(state), { path: PATH_NOTIFY });
-}
+export const selectIsNotifyPage = createSelector(
+  selectPathname,
+  pathname => !!matchPath(pathname, { path: PATH_NOTIFY })
+);
 
 export function selectIsNotifyMessage(state) {
   return state.notify.message;
