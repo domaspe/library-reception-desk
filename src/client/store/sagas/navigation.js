@@ -175,6 +175,11 @@ function* locationChange() {
     return;
   }
 
+  if (yield select(selectIsFaceScanPagePaused)) {
+    yield call(waitForInactivity, USERPICKER_TIMEOUT, actions.startScanningFaces());
+    return;
+  }
+
   if (yield select(selectIsFaceScanPage)) {
     yield call(waitForInactivity, HIBERNATE_TIMEOUT, actions.hibernate());
     return;
@@ -182,11 +187,6 @@ function* locationChange() {
 
   if (yield select(selectIsNotRecognizedPage)) {
     yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
-    return;
-  }
-
-  if (yield select(selectIsFaceScanPagePaused)) {
-    yield call(waitForInactivity, USERPICKER_TIMEOUT, actions.startScanningFaces());
     return;
   }
 
