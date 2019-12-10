@@ -1,39 +1,36 @@
 /* eslint-disable */
-import React from 'react';
-import { CssBaseline, Box } from '@material-ui/core';
-import { ThemeProvider } from '@material-ui/styles';
-import { connect } from 'react-redux';
-import { Route } from 'react-router-dom';
-import { ConnectedRouter } from 'connected-react-router';
-import { AnimatedSwitch, spring } from 'react-router-transition';
+import { Box, CssBaseline } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import { ConnectedRouter } from 'connected-react-router';
+import React, { useEffect } from 'react';
 import { hot } from 'react-hot-loader';
-
-import HiddenCamera from './HiddenCamera';
-import * as actions from '../store/actions';
-
-import SleepPage from './pages/SleepPage';
-import FaceScanPage from './pages/FaceScanPage';
-import NotRecognizedPage from './pages/NotRecognizedPage';
-import SessionPage from './pages/SessionPage';
-import HelpPage from './pages/HelpPage';
-import history from '../utils/history';
+import { useDispatch } from 'react-redux';
+import { Route } from 'react-router-dom';
+import { AnimatedSwitch, spring } from 'react-router-transition';
 import {
-  PATH_FACE_SCAN,
-  PATH_SLEEP,
-  PATH_SESSION,
-  PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
+  PATH_FACE_SCAN,
   PATH_HELP,
-  PATH_NOTIFY
+  PATH_NOTIFY,
+  PATH_NOT_RECOGNIZED,
+  PATH_SESSION,
+  PATH_SLEEP
 } from '../constants';
-import CreateUserPage from './pages/CreateUserPage';
+import * as actions from '../store/actions';
+import history from '../utils/history';
 import { theme } from '../utils/theme';
+import './app.css';
 import Drawer from './common/Drawer';
 import DrawerButton from './common/DrawerButton';
-
-import './app.css';
+import HiddenCamera from './HiddenCamera';
+import CreateUserPage from './pages/CreateUserPage';
+import FaceScanPage from './pages/FaceScanPage';
+import HelpPage from './pages/HelpPage';
 import NotifyPage from './pages/NotifyPage';
+import NotRecognizedPage from './pages/NotRecognizedPage';
+import SessionPage from './pages/SessionPage';
+import SleepPage from './pages/SleepPage';
 
 function mapStyles(styles) {
   return {
@@ -64,10 +61,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const App = ({ appInit }) => {
+const App = () => {
   const classes = useStyles();
-  React.useEffect(() => {
-    appInit();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(actions.appInit());
 
     const timeout = setTimeout(() => {
       location.reload(true);
@@ -119,7 +117,4 @@ const App = ({ appInit }) => {
   );
 };
 
-export default connect(
-  null,
-  { appInit: actions.appInit }
-)(hot(module)(App));
+export default hot(module)(App);

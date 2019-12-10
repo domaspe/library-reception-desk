@@ -110,17 +110,13 @@ export const selectItemsStateItems = createSelector(
   }
 );
 
-export const selectItemsStateItemsSortedByTime = createSelector(
-  selectItemsStateItems,
-  items => [...items].sort(sortByTime('timeTaken'))
+export const selectItemsStateItemsSortedByTime = createSelector(selectItemsStateItems, items =>
+  [...items].sort(sortByTime('timeTaken'))
 );
 
-export const selectItemsStateItemsSortedByTitle = createSelector(
-  selectItemsStateItems,
-  items => {
-    return [...items].sort(sortByKey('stringified'));
-  }
-);
+export const selectItemsStateItemsSortedByTitle = createSelector(selectItemsStateItems, items => {
+  return [...items].sort(sortByKey('stringified'));
+});
 
 export function selectClassesLoaded(state) {
   return selectUsers(state).length > 0;
@@ -146,14 +142,12 @@ export const selectUserItems = createSelector(
   (items, userId) => items.filter(item => String(item.takenByUserId) === String(userId))
 );
 
-export const selectFreeItems = createSelector(
-  selectItemsStateItemsSortedByTitle,
-  items => items.filter(item => !item.timeTaken)
+export const selectFreeItems = createSelector(selectItemsStateItemsSortedByTitle, items =>
+  items.filter(item => !item.timeTaken)
 );
 
-export const selectTakenItems = createSelector(
-  selectItemsStateItemsSortedByTitle,
-  items => items.filter(item => item.timeTaken)
+export const selectTakenItems = createSelector(selectItemsStateItemsSortedByTitle, items =>
+  items.filter(item => item.timeTaken)
 );
 
 const selectFilteredItems = (filterPhrase, items) => {
@@ -170,27 +164,36 @@ const selectFilteredItems = (filterPhrase, items) => {
   return filteredItems;
 };
 
-export const createFreeItemsFilterSelector = createSelector(
-  selectFreeItems,
-  freeItems => filter => selectFilteredItems(filter, freeItems)
+export const createFreeItemsFilterSelector = createSelector(selectFreeItems, freeItems => filter =>
+  selectFilteredItems(filter, freeItems)
 );
 
-export const createTakenItemsFilterSelector = createSelector(
-  selectTakenItems,
-  items => {
-    return filter => {
-      return selectFilteredItems(filter, items);
-    };
-  }
-);
+export const createTakenItemsFilterSelector = createSelector(selectTakenItems, items => {
+  return filter => {
+    return selectFilteredItems(filter, items);
+  };
+});
 
 function selectPathname(state) {
   const { pathname } = selectRouterState(state).location;
   return pathname;
 }
 
+export function selectSearch(state) {
+  const { search } = selectRouterState(state).location;
+  return search;
+}
+
 export function selectIsHibernatedPage(state) {
   return !!matchPath(selectPathname(state), { path: PATH_SLEEP });
+}
+
+export function selectIsFaceScanPagePaused(state) {
+  const pathname = selectPathname(state);
+  const search = selectSearch(state);
+  return (
+    search === '?pause' && (!!matchPath(pathname, { path: PATH_FACE_SCAN }) || pathname === '/')
+  );
 }
 
 export function selectIsFaceScanPage(state) {

@@ -11,6 +11,7 @@ export const MIN_CONSECUTIVE_MATCHES = 2;
 
 export const TIMEOUT_AFTER_ASSIGN = 2000;
 export const HIBERNATE_TIMEOUT = 30000;
+export const USERPICKER_TIMEOUT = 10000;
 
 export const PATH_SLEEP = '/sleep';
 export const PATH_FACE_SCAN = '/facescan';
