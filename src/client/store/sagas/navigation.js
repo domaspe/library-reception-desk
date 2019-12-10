@@ -1,42 +1,43 @@
-import {
-  takeLatest,
-  call,
-  put,
-  all,
-  select,
-  race,
-  delay,
-  take,
-  cancel,
-  fork
-} from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
 import { LOCATION_CHANGE } from 'connected-react-router';
-import UIfx from 'uifx';
-
-import * as actions from '../actions';
+import { eventChannel } from 'redux-saga';
 import {
-  selectIsHibernatedPage,
-  selectIsFaceScanPage,
-  selectIsSessionPage,
-  selectIsNotRecognizedPage,
-  selectIsHelpPage,
-  selectIsEnoughConsecutiveMatchSuccesses,
-  selectIsNotifyPage
-} from '../selectors';
+  all,
+  call,
+  cancel,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  take,
+  takeLatest
+} from 'redux-saga/effects';
+import UIfx from 'uifx';
+import loginAudio from '../../../../assets/login.mp3';
 import {
   HIBERNATE_TIMEOUT,
-  PATH_FACE_SCAN,
-  PATH_SESSION,
-  PATH_SLEEP,
-  PATH_NOT_RECOGNIZED,
   PATH_CREATE_USER,
+  PATH_FACE_SCAN,
   PATH_HELP,
   PATH_NOTIFY,
-  TIMEOUT_AFTER_ASSIGN
+  PATH_NOT_RECOGNIZED,
+  PATH_SESSION,
+  PATH_SLEEP,
+  TIMEOUT_AFTER_ASSIGN,
+  USERPICKER_TIMEOUT
 } from '../../constants';
 import history from '../../utils/history';
-import loginAudio from '../../../../assets/login.mp3';
+import * as actions from '../actions';
+import {
+  selectIsEnoughConsecutiveMatchSuccesses,
+  selectIsFaceScanPage,
+  selectIsFaceScanPagePaused,
+  selectIsHelpPage,
+  selectIsHibernatedPage,
+  selectIsNotifyPage,
+  selectIsNotRecognizedPage,
+  selectIsSessionPage
+} from '../selectors';
 
 const loginFx = new UIfx(loginAudio, {
   volume: 0.3, // number between 0.0 ~ 1.0
@@ -181,6 +182,11 @@ function* locationChange() {
 
   if (yield select(selectIsNotRecognizedPage)) {
     yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
+    return;
+  }
+
+  if (yield select(selectIsFaceScanPagePaused)) {
+    yield call(waitForInactivity, USERPICKER_TIMEOUT, actions.startScanningFaces());
     return;
   }
 

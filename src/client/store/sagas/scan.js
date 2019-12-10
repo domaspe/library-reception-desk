@@ -1,51 +1,50 @@
+import moment from 'moment';
+import { eventChannel } from 'redux-saga';
 import {
-  takeLatest,
-  call,
-  put,
   all,
-  select,
-  race,
+  call,
+  cancel,
   delay,
   fork,
+  put,
+  race,
+  select,
   take,
-  cancel
+  takeLatest
 } from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
-import moment from 'moment';
-
-import * as actions from '../actions';
-import { waitFor } from '../../utils/sagas';
 import {
-  selectIsFaceDetected,
-  selectQrCode,
-  selectIsFaceScanPage,
-  selectIsSessionPage,
-  selectFaceCannotBeMatched,
-  selectIsHibernatedPage,
-  selectFaceMissingForHistory,
-  selectActiveUserId,
-  selectIsHelpPage,
-  selectIsCreateUserPage,
-  selectIsReadingFace,
-  selectClasses
-} from '../selectors';
-
+  FACE_DELAY_BEFORE_SCAN_INTERVAL,
+  FACE_QUICK_SCAN_INTERVAL,
+  FACE_READ_FACE_SCAN_INTERVAL,
+  FACE_SCAN_TASK_INTERVAL,
+  FACE_SLOW_SCAN_INTERVAL,
+  PATH_CREATE_USER,
+  PATH_FACE_SCAN,
+  PATH_HELP,
+  PATH_SESSION,
+  TIMEOUT_AFTER_ASSIGN
+} from '../../constants';
+import { __displayFaceTimeStats, __displayQrTimeStats } from '../../utils/displayTimeStats';
 import * as face from '../../utils/face';
 import * as qr from '../../utils/qr';
-import {
-  FACE_SLOW_SCAN_INTERVAL,
-  TIMEOUT_AFTER_ASSIGN,
-  FACE_QUICK_SCAN_INTERVAL,
-  FACE_SCAN_TASK_INTERVAL,
-  PATH_CREATE_USER,
-  PATH_SESSION,
-  FACE_DELAY_BEFORE_SCAN_INTERVAL,
-  PATH_FACE_SCAN,
-  FACE_READ_FACE_SCAN_INTERVAL,
-  PATH_HELP
-} from '../../constants';
 import QrWorker from '../../utils/qr.worker';
-import { __displayFaceTimeStats, __displayQrTimeStats } from '../../utils/displayTimeStats';
+import { waitFor } from '../../utils/sagas';
+import * as actions from '../actions';
+import {
+  selectActiveUserId,
+  selectClasses,
+  selectFaceCannotBeMatched,
+  selectFaceMissingForHistory,
+  selectIsCreateUserPage,
+  selectIsFaceDetected,
+  selectIsFaceScanPage,
+  selectIsFaceScanPagePaused,
+  selectIsHelpPage,
+  selectIsHibernatedPage,
+  selectIsReadingFace,
+  selectIsSessionPage,
+  selectQrCode
+} from '../selectors';
 
 const moduleCreateTime = moment();
 const animationFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
@@ -121,6 +120,8 @@ function* scanFaceWorker() {
       lastState = PATH_SESSION;
     } else if (yield select(selectIsHelpPage)) {
       lastState = PATH_HELP;
+    } else if (yield select(selectIsFaceScanPagePaused)) {
+      lastState = 'faceScanPaused';
     } else if (yield select(selectIsFaceScanPage)) {
       cancelCurrentScan = lastState !== PATH_FACE_SCAN;
       delayNextIteration = cancelCurrentScan

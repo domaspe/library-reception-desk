@@ -1,13 +1,12 @@
+import { makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
-import { Typography, makeStyles } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import Layout from '../common/Layout';
+import { useSelector } from 'react-redux';
 import { selectNotifyAssignItemSuccess } from '../../store/selectors';
 import { useIconAnimation } from '../../utils/hooks';
-import HelpButton from '../common/HelpButton';
 import ChooseUserButton from '../common/ChooseUserButton';
 import CreateNewUserButton from '../common/CreateNewUserButton';
+import HelpButton from '../common/HelpButton';
+import Layout from '../common/Layout';
 
 const useStyles = makeStyles(() => ({
   buttonContainer: {
@@ -23,8 +22,9 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const FaceScanPage = ({ assignItemSuccess }) => {
+const FaceScanPage = () => {
   const classes = useStyles();
+  const assignItemSuccess = useSelector(selectNotifyAssignItemSuccess);
   const [animateIcon, onIconAnimationEnd] = useIconAnimation(assignItemSuccess);
   return (
     <Layout
@@ -49,12 +49,4 @@ const FaceScanPage = ({ assignItemSuccess }) => {
   );
 };
 
-FaceScanPage.propTypes = {
-  assignItemSuccess: PropTypes.bool.isRequired
-};
-
-const mapSateToProps = state => ({
-  assignItemSuccess: selectNotifyAssignItemSuccess(state)
-});
-
-export default connect(mapSateToProps)(FaceScanPage);
+export default FaceScanPage;

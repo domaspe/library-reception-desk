@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Typography, IconButton, Paper, Box, Fade, Grow } from '@material-ui/core';
+import { Box, ButtonBase, Fade, Grow, Paper, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import PropTypes from 'prop-types';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import React, { useCallback, useEffect, useState } from 'react';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import List from 'react-virtualized/dist/commonjs/List';
 
@@ -25,8 +25,12 @@ const useStyles = makeStyles(theme => ({
     alignSelf: 'center',
     width: '100%'
   },
-  itemContainer: {
-    padding: theme.spacing(2, 2, 0.5, 2)
+  itemButton: {
+    // margin: theme.spacing(2, 2, 0.5, 2),
+    textAlign: 'left',
+    display: 'block',
+    width: '100%',
+    height: '100%'
   },
   item: {
     padding: theme.spacing(0, 2, 0, 2),
@@ -96,46 +100,46 @@ const ItemList = ({ onItemClick, items, showAdd, height: componentHeight, animat
   const rowRenderer = ({ index, style }) => {
     const item = items[index];
     const itemComponent = (
-      <div key={item.id} className={classes.itemContainer} style={style}>
-        <Paper className={classes.item} title={createTitle(item)}>
-          <div className={classes.itemContent}>
-            <div className={classes.thumbnailContainer}>
-              <Box
-                className={classes.thumbnail}
-                style={{
-                  backgroundImage: item.thumbnailUrl ? `url("${item.thumbnailUrl}")` : undefined
-                }}
-              />
-            </div>
-            <div className={classes.descriptionContainer}>
-              <Typography className={classes.primaryTitle} noWrap>
-                {item.primaryTitle}
-              </Typography>
-              <Typography className={classes.secondaryTitle} noWrap>
-                {item.secondaryTitle}
-              </Typography>
-              {!!item.takenByUser && (
-                <Typography variant="caption" noWrap>
-                  {'Taken '}
-                  {moment(item.timeTaken).format('MMM Do, hh:mm')}
-                  {' by '}
-                  <span className={classes.user}>{item.takenByUser.name}</span>
+      <Box px={2} pt={2} pb={0.5} style={style} display="flex" alignItems="stretch">
+        <ButtonBase
+          key={item.id}
+          className={classes.itemButton}
+          onClick={() => handleItemClick(item.id)}
+        >
+          {/* <div focusRipple onClick={() => handleItemClick(item.id)}> */}
+          <Paper className={classes.item} title={createTitle(item)}>
+            <div className={classes.itemContent}>
+              <div className={classes.thumbnailContainer}>
+                <Box
+                  className={classes.thumbnail}
+                  style={{
+                    backgroundImage: item.thumbnailUrl ? `url("${item.thumbnailUrl}")` : undefined
+                  }}
+                />
+              </div>
+              <div className={classes.descriptionContainer}>
+                <Typography className={classes.primaryTitle} noWrap>
+                  {item.primaryTitle}
                 </Typography>
-              )}
+                <Typography className={classes.secondaryTitle} noWrap>
+                  {item.secondaryTitle}
+                </Typography>
+                {!!item.takenByUser && (
+                  <Typography variant="caption" noWrap>
+                    {'Taken '}
+                    {moment(item.timeTaken).format('MMM Do, hh:mm')}
+                    {' by '}
+                    <span className={classes.user}>{item.takenByUser.name}</span>
+                  </Typography>
+                )}
+              </div>
+              {showAdd && <AddIcon fontSize="large" color="primary" />}
+              {!showAdd && !!item.timeTaken && <RemoveIcon fontSize="large" color="primary" />}
             </div>
-            {showAdd && (
-              <IconButton color="primary" onClick={() => handleItemClick(item.id)}>
-                <AddIcon fontSize="large" />
-              </IconButton>
-            )}
-            {!showAdd && !!item.timeTaken && (
-              <IconButton color="primary" onClick={() => handleItemClick(item.id)}>
-                <RemoveIcon fontSize="large" />
-              </IconButton>
-            )}
-          </div>
-        </Paper>
-      </div>
+          </Paper>
+          {/* </div> */}
+        </ButtonBase>
+      </Box>
     );
 
     if (animate) {
