@@ -120,9 +120,15 @@ export async function createFaceMatcher(classes) {
   }
 }
 
+let backend = null;
 export async function scan() {
   if (video.paused || video.ended) {
     return null;
+  }
+
+  if (!backend) {
+    backend = faceapi.tf.getBackend();
+    if (backend) console.log('Tf backend', backend);
   }
 
   const debug = {};
