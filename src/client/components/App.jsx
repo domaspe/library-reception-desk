@@ -66,14 +66,6 @@ const App = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(actions.appInit());
-
-    const timeout = setTimeout(() => {
-      location.reload(true);
-    }, 1000 * 60 * 30 /* 0.5h */);
-
-    return () => {
-      clearTimeout(timeout);
-    };
   });
 
   return (
