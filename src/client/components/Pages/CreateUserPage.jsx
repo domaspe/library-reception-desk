@@ -1,30 +1,29 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import {
-  CircularProgress,
-  TextField,
   Button,
-  makeStyles,
-  FormControlLabel,
   Checkbox,
-  Typography,
-  Stepper,
-  Step,
-  StepLabel,
+  CircularProgress,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
+  DialogTitle,
+  FormControlLabel,
+  makeStyles,
+  Step,
+  StepLabel,
+  Stepper,
+  TextField,
+  Typography,
   Zoom
 } from '@material-ui/core';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
-import * as selectors from '../../store/selectors';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../../store/actions';
-import Layout from '../common/Layout';
+import * as selectors from '../../store/selectors';
 import CloseButton from '../common/CloseButton';
+import Layout from '../common/Layout';
 import Video from '../common/Video';
 
 const useStyles = makeStyles(theme => ({
@@ -77,7 +76,8 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     top: 0,
     left: 0,
-    color: theme.palette.primary.main,
+    color: theme.palette.grey[900],
+    fontWeight: 500,
     textShadow: '-1px 0 white, 0 1px white, 1px 0 white, 0 -1px white'
   },
   progress: {
@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }) => {
+const CreateUserPage = () => {
   const classes = useStyles();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
@@ -95,54 +95,63 @@ const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }
   const [showUserExists, setShowUserExists] = useState(false);
   const [cameraCountdown, setCameraCountdown] = useState(3);
 
-  const handleNameChange = useCallback(event => {
+  const dispatch = useDispatch();
+  const progress = useSelector(selectors.selectFaceDataCollectedPercentage);
+  const users = useSelector(selectors.selectUsers);
+  const isSendingData = useSelector(selectors.selectIsUpdatingUser);
+
+  const handleCancel = () => dispatch(actions.startScanningFaces());
+
+  const handleNameChange = event => {
     setName(event.target.value.trim());
-  });
-  const handleSaveFaceChange = useCallback(event => setSaveFace(!!event.target.checked));
-  const handleUserExistsCancel = useCallback(() => setShowUserExists(false));
+  };
+  const handleSaveFaceChange = event => setSaveFace(!!event.target.checked);
+  const handleUserExistsCancel = () => setShowUserExists(false);
 
-  const goToNextStep = useCallback(
-    (newStep, overwriteUser) => {
-      if (newStep === 1) {
-        const userExists = users.find(user => user.name === name);
-        if (userExists && !overwriteUser) {
-          setShowUserExists(true);
-          return;
-        }
+  const goToNextStep = (newStep, overwriteUser) => {
+    if (newStep === 1) {
+      const userExists = users.find(user => user.name === name);
+      if (userExists && !overwriteUser) {
+        setShowUserExists(true);
+        return;
       }
+    }
 
-      if (newStep === 2 && !saveFace) {
-        onSaveFace(name, false);
+    if (newStep === 2 && !saveFace) {
+      dispatch(actions.saveFace(name, false));
+      return;
+    }
+
+    setStep(newStep);
+  };
+
+  const handleFormSubmit = newStep => event => {
+    event.preventDefault();
+    goToNextStep(newStep);
+  };
+
+  const handleUserExistsConfirm = () => {
+    setShowUserExists(false);
+    goToNextStep(step + 1, true);
+  };
+
+  useEffect(() => {
+    const enterListener = event => {
+      if (event.key !== 'Enter') return;
+
+      if (showUserExists) {
+        handleUserExistsConfirm();
         return;
       }
 
-      setStep(newStep);
-    },
-    [name, saveFace, users]
-  );
-
-  const handleFormSubmit = useCallback(
-    newStep => event => {
+      goToNextStep(step + 1);
       event.preventDefault();
-      goToNextStep(newStep);
-    },
-    [name, saveFace, users]
-  );
-
-  const handleUserExistsConfirm = useCallback(() => {
-    setShowUserExists(false);
-    goToNextStep(step + 1, true);
-  }, [step]);
-
-  useEffect(() => {
-    const listener = event => {
-      if (event.key === 'Enter') {
-        goToNextStep(step + 1);
-      }
+      event.stopPropagation();
     };
-    document.addEventListener('keydown', listener);
+
+    document.addEventListener('keydown', enterListener);
     return () => {
-      document.removeEventListener('keydown', listener);
+      document.removeEventListener('keydown', enterListener);
     };
   }, [handleFormSubmit, step]);
 
@@ -158,7 +167,7 @@ const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }
     }
 
     if (step === 3 && cameraCountdown === 0) {
-      onSaveFace(name, true);
+      dispatch(actions.saveFace(name, true));
     }
 
     return undefined;
@@ -203,7 +212,7 @@ const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }
         }
       >
         <>
-          <CloseButton onClick={onCancel} />
+          <CloseButton onClick={handleCancel} />
           <div className={classes.container}>
             <Stepper activeStep={step} className={classes.stepper}>
               <Step completed={step > 0}>
@@ -317,26 +326,4 @@ const CreateUserPage = ({ users, progress, onSaveFace, onCancel, isSendingData }
   );
 };
 
-CreateUserPage.propTypes = {
-  progress: PropTypes.number.isRequired,
-  onSaveFace: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  isSendingData: PropTypes.bool.isRequired,
-  users: PropTypes.array.isRequired
-};
-
-const mapStateToProps = state => ({
-  progress: selectors.selectFaceDataCollectedPercentage(state),
-  users: selectors.selectUsers(state),
-  isSendingData: false // selectors.selectIsUpdatingUser(state)
-});
-
-const mapDispatchToProps = {
-  onSaveFace: actions.saveFace,
-  onCancel: actions.startScanningFaces
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CreateUserPage);
+export default CreateUserPage;
