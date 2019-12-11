@@ -19,16 +19,14 @@ const db = new sqlite3.Database(pathToDatabase, err => {
 });
 
 function closeDb() {
-  db.close(() => {
-    console.log('Database closed');
+  return new Promise(resolve => {
+    db.close(() => {
+      console.log('Database closed');
+      resolve();
+    });
   });
 }
 
-['exit', 'SIGINT', `SIGHUP`].forEach(eventType => {
-  process.on(eventType, () => {
-    closeDb();
-  });
-});
 
 function run(query, args) {
   return new Promise((resolve, reject) => {
@@ -188,6 +186,7 @@ module.exports = {
   getItem,
   updateItem,
   log,
+  closeDb,
   LOG_TAKE_ITEM,
   LOG_RETURN_ITEM,
   LOG_CREATE_USER,

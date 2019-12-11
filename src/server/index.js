@@ -97,3 +97,12 @@ if (process.env.NODE_ENV === 'production') {
 (httpsServer || app).listen(process.env.PORT || 8080, () => {
   console.log(`Listening on port ${process.env.PORT || 8080}!`);
 });
+
+['exit', 'SIGINT', `SIGHUP`].forEach(eventType => {
+  process.on(eventType, () => {
+    console.log(`\nGracefully shutting down from ${eventType} (Ctrl-C)`);
+    Promise.resolve()
+      .then(() => db.closeDb())
+      .then(() => process.exit(1));
+  });
+});

@@ -5,7 +5,25 @@ const Video = ({ onLoadedMetadata, ...props }) => {
 
   useEffect(() => {
     if (navigator.mediaDevices && videoRef.current) {
-      navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
+      navigator.mediaDevices.enumerateDevices().then(devices => {
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        if (videoDevices.length > 1) {
+          return {
+            video: {
+              deviceId: {
+                exact: videoDevices[videoDevices.length - 1].deviceId
+              }
+            }
+          }
+        }
+
+        return {
+          video: {}
+        }
+      }).then(constraints => {
+        return navigator.mediaDevices.getUserMedia(constraints);
+      })
+      .then(stream => {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       });
