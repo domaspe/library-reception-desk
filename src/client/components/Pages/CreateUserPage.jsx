@@ -103,22 +103,23 @@ const CreateUserPage = () => {
   const handleCancel = () => dispatch(actions.startScanningFaces());
 
   const handleNameChange = event => {
-    setName(event.target.value.trim());
+    setName(event.target.value);
   };
   const handleSaveFaceChange = event => setSaveFace(!!event.target.checked);
   const handleUserExistsCancel = () => setShowUserExists(false);
 
   const goToNextStep = (newStep, overwriteUser) => {
     if (newStep === 1) {
-      const userExists = users.find(user => user.name === name);
-      if (userExists && !overwriteUser) {
+      const existingUser = users.find(user => user.name.toLowerCase() === name.toLowerCase());
+      if (existingUser && !overwriteUser) {
+        setName(existingUser.name);
         setShowUserExists(true);
         return;
       }
     }
 
     if (newStep === 2 && !saveFace) {
-      dispatch(actions.saveFace(name, false));
+      dispatch(actions.saveFace(name.trim(), false));
       return;
     }
 
@@ -167,7 +168,7 @@ const CreateUserPage = () => {
     }
 
     if (step === 3 && cameraCountdown === 0) {
-      dispatch(actions.saveFace(name, true));
+      dispatch(actions.saveFace(name.trim(), true));
     }
 
     return undefined;
@@ -241,8 +242,8 @@ const CreateUserPage = () => {
                   variant="outlined"
                   inputProps={{
                     required: true,
-                    pattern: '.{3,35}',
-                    title: '3 to 35 characters'
+                    pattern: '.{3,25}',
+                    title: '3 to 25 characters'
                   }}
                 />
                 <Dialog open={showUserExists} onClose={handleUserExistsCancel}>

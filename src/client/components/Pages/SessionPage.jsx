@@ -121,6 +121,7 @@ const SessionPage = memo(
             </div>
           </>
         }
+        fullHeight
       >
         <CloseButton onClick={onLogout} />
         <AppBar position="relative" color="default">

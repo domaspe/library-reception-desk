@@ -30,7 +30,9 @@ const useStyles = makeStyles(theme => ({
   },
   children: {
     minHeight: '30vh',
-    flexDirection: 'column',
+    flexDirection: 'column'
+  },
+  flex: {
     flex: 1
   },
   logButton: {
@@ -44,7 +46,8 @@ const Layout = ({
   actions,
   titleComponent,
   animateIcon,
-  onIconAnimationEnd
+  onIconAnimationEnd,
+  fullHeight
 }) => {
   const classes = useStyles();
 
@@ -61,7 +64,11 @@ const Layout = ({
         />
       )}
       {titleComponent && <div className={classes.box}>{titleComponent}</div>}
-      {children && <div className={`${classes.box} ${classes.children}`}>{children}</div>}
+      {children && (
+        <div className={`${classes.box} ${classes.children} ${fullHeight ? classes.flex : ''}`}>
+          {children}
+        </div>
+      )}
       {actions && <div className={classes.box}>{actions}</div>}
     </div>
   );
@@ -71,7 +78,8 @@ Layout.propTypes = {
   iconSrc: PropTypes.string.isRequired,
   titleComponent: PropTypes.node,
   children: PropTypes.node,
-  actions: PropTypes.node
+  actions: PropTypes.node,
+  fullHeight: PropTypes.bool
 };
 
 export default Layout;

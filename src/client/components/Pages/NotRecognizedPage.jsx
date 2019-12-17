@@ -32,9 +32,7 @@ const NotRecognizedPage = ({ onHelp, onClose }) => {
             Read more
           </Link>
         }
-        {
-          ' about why this might have happened or select one of the options below to continue.'
-        }
+        {' about why this might have happened or select one of the options below to continue.'}
       </Typography>
     </Layout>
   );
@@ -49,7 +47,4 @@ const mapDispatchToProps = {
   onClose: actions.startScanningFaces
 };
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(NotRecognizedPage);
+export default connect(null, mapDispatchToProps)(NotRecognizedPage);
