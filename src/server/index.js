@@ -50,7 +50,6 @@ app.get('/api/items', (req, res, next) => {
 
 app.post('/api/users', (req, res, next) => {
   const { id, name, descriptors } = req.body;
-  console.log('>>> ', { id, name });
   return handlers
     .addOrUpdateUser(Number(id), name, descriptors)
     .then(() => res.sendStatus(200))
