@@ -6,15 +6,7 @@ import Layout from '../common/Layout';
 const SleepPage = () => {
   return (
     <>
-      <div
-        style={{
-          // Hack to make screen burn line full width
-          position: 'absolute',
-          left: '-5vw'
-        }}
-      >
-        <ScreenBurnLine />
-      </div>
+      <ScreenBurnLine />
       <Layout
         iconSrc="/assets/sleep.svg"
         titleComponent={
