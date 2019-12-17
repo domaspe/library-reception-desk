@@ -30,7 +30,8 @@ const useStyles = makeStyles(theme => ({
   },
   children: {
     minHeight: '30vh',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    flex: 1
   },
   logButton: {
     position: 'absolute'

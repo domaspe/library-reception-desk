@@ -31,7 +31,8 @@ const useStyles = makeStyles(theme => ({
   },
   swipeable: {
     backgroundColor: theme.palette.background.paper,
-    width: '100%'
+    width: '100%',
+    flex: 1
   },
   tabTop: {
     margin: theme.spacing(2),
@@ -43,7 +44,9 @@ const useStyles = makeStyles(theme => ({
   searchContainer: {
     marginLeft: theme.spacing(2)
   },
-  tabContent: {},
+  tabContent: {
+    flex: 1
+  },
   badge: {
     padding: theme.spacing(0, 2)
   },
@@ -146,7 +149,7 @@ const SessionPage = memo(
                 face the QR code on the back of the device towards the camera.
               </Typography>
             </div>
-            <ItemList items={userItems} onItemClick={handlRemoveItemClick} height="auto" />
+            <ItemList items={userItems} onItemClick={handlRemoveItemClick} height="100%" />
           </>
           <>
             <div className={classes.tabTop}>
@@ -158,7 +161,7 @@ const SessionPage = memo(
               </div>
             </div>
             <div className={classes.tabContent}>
-              <ItemList items={freeItems} onItemClick={handleAddItemClick} showAdd />
+              <ItemList items={freeItems} onItemClick={handleAddItemClick} showAdd height="100%" />
             </div>
           </>
         </SwipeableViews>
