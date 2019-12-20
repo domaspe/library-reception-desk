@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-end'
   },
   content: {
-    width: '100vw',
+    width: '100%',
     flex: 1
   }
 }));

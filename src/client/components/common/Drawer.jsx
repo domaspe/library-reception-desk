@@ -1,5 +1,13 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Drawer as MUIDrawer, IconButton, AppBar, Tabs, Tab } from '@material-ui/core';
+import {
+  Drawer as MUIDrawer,
+  IconButton,
+  AppBar,
+  Tabs,
+  Tab,
+  Typography,
+  Toolbar
+} from '@material-ui/core';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -10,6 +18,7 @@ import { selectIsItemsDrawerOpen } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import DrawerItems from './DrawerItems';
 import Statistics from './Statistics';
+import Icon from './Icon';
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -26,12 +35,10 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  close: {
-    alignSelf: 'flex-end'
-  },
+  close: {},
   content: {
     backgroundColor: theme.palette.background.paper,
-    width: '100vw',
+    width: '90vw',
     height: '100%'
   },
   swipeableSlide: {
@@ -39,6 +46,17 @@ const useStyles = makeStyles(theme => ({
   },
   tabs: {
     flex: 1
+  },
+  toolbar: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  logo: {
+    display: 'flex'
+  },
+  name: {
+    paddingLeft: theme.spacing(1)
   }
 }));
 
@@ -63,9 +81,17 @@ const Drawer = ({ open, setDrawerOpen }) => {
     <MUIDrawer open={open} onClose={handleClose}>
       <div className={classes.drawerHeader}>
         <AppBar color="default" position="static">
-          <IconButton onClick={handleClose} className={classes.close}>
-            <ChevronLeftIcon fontSize="large" />
-          </IconButton>
+          <Toolbar className={classes.toolbar}>
+            <div className={classes.logo}>
+              <Icon src="/assets/knopka.png" size={35} />
+              <Typography variant="h6" color="textPrimary" className={classes.name}>
+                Knopka 2
+              </Typography>
+            </div>
+            <IconButton onClick={handleClose} className={classes.close} edge="end">
+              <ChevronLeftIcon fontSize="large" />
+            </IconButton>
+          </Toolbar>
           <Tabs
             value={tab}
             onChange={handleTabChange}
@@ -107,7 +133,4 @@ const mapDispatchToProps = {
   setDrawerOpen: actions.setItemsDrawerOpen
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Drawer);
+export default connect(mapStateToProps, mapDispatchToProps)(Drawer);
