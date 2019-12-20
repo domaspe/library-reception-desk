@@ -36,7 +36,8 @@ import {
   selectIsHibernatedPage,
   selectIsNotifyPage,
   selectIsNotRecognizedPage,
-  selectIsSessionPage
+  selectIsSessionPage,
+  selectIsCreateUserPage
 } from '../selectors';
 
 const loginFx = new UIfx(loginAudio, {
@@ -187,6 +188,11 @@ function* locationChange() {
 
   if (yield select(selectIsNotRecognizedPage)) {
     yield call(waitForInactivity, HIBERNATE_TIMEOUT * 2, actions.startScanningFaces());
+    return;
+  }
+
+  if (yield select(selectIsCreateUserPage)) {
+    yield call(waitForInactivity, HIBERNATE_TIMEOUT * 3, actions.startScanningFaces());
     return;
   }
 
