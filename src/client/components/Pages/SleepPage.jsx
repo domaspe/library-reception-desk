@@ -6,7 +6,7 @@ import Layout from '../common/Layout';
 const SleepPage = () => {
   return (
     <>
-      <ScreenBurnLine />
+      <ScreenBurnLine retriggerTime={1800000} triggerTime={1800000} />
       <Layout
         iconSrc="/assets/sleep.svg"
         titleComponent={
