@@ -1,26 +1,27 @@
 import { matchPath } from 'react-router-dom';
 import { createSelector } from 'reselect';
-import {
-  SAVE_FACE_START,
-  FACE_DETECT_SUCCESS,
-  LOAD_USERS,
-  ASSIGN_ITEM_SUCCESS,
-  UPDATE_USER,
-  LOAD_STATISTICS
-} from './actions';
+import { orderBy } from 'natural-orderby';
 import {
   DESCRIPTORS_PER_CLASS,
-  PATH_SLEEP,
-  PATH_FACE_SCAN,
-  PATH_SESSION,
-  PATH_NOT_RECOGNIZED,
-  PATH_CREATE_USER,
-  PATH_HELP,
-  MAX_CONSECUTIVE_FAILED_MATCH_ATTEMPTS,
   MAX_CONSECUTIVE_FAILED_DETECT_ATTEMPTS,
+  MAX_CONSECUTIVE_FAILED_MATCH_ATTEMPTS,
   MIN_CONSECUTIVE_MATCHES,
-  PATH_NOTIFY
+  PATH_CREATE_USER,
+  PATH_FACE_SCAN,
+  PATH_HELP,
+  PATH_NOTIFY,
+  PATH_NOT_RECOGNIZED,
+  PATH_SESSION,
+  PATH_SLEEP
 } from '../constants';
+import {
+  ASSIGN_ITEM_SUCCESS,
+  FACE_DETECT_SUCCESS,
+  LOAD_STATISTICS,
+  LOAD_USERS,
+  SAVE_FACE_START,
+  UPDATE_USER
+} from './actions';
 
 const selectFaceState = state => state.face;
 const selectFaceMatchState = state => state.faceMatch;
@@ -32,7 +33,6 @@ const selectActiveUserState = state => state.activeUser;
 const selectRouterState = state => state.router;
 const selectStatisticsState = state => state.statistics;
 
-const sortByKey = key => (a, b) => (a[key] > b[key] ? 1 : -1);
 const sortByTime = key => (a, b) => new Date(b[key]) - new Date(a[key]);
 
 export function selectFaceHistoryDescriptors(state) {
@@ -115,7 +115,7 @@ export const selectItemsStateItemsSortedByTime = createSelector(selectItemsState
 );
 
 export const selectItemsStateItemsSortedByTitle = createSelector(selectItemsStateItems, items => {
-  return [...items].sort(sortByKey('stringified'));
+  return orderBy(items, 'stringified');
 });
 
 export function selectClassesLoaded(state) {
