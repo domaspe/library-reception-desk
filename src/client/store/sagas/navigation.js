@@ -104,7 +104,7 @@ function* waitForInactivity(timeout, action) {
 
 function* startSession({ userId }) {
   yield put(actions.setActiveUser(userId));
-  yield call(loginFx.play);
+  // yield call(loginFx.play);
   yield call(history.replace, PATH_SESSION);
 }
 
