@@ -127,7 +127,7 @@ const ItemList = ({ onItemClick, items, showAdd, height: componentHeight, animat
                 {!!item.takenByUser && (
                   <Typography variant="caption" noWrap>
                     {'Taken '}
-                    {moment(item.timeTaken).format('MMM Do, hh:mm')}
+                    {moment(item.timeTaken).format('MMM Do, HH:mm')}
                     {' by '}
                     <span className={classes.user}>{item.takenByUser.name}</span>
                   </Typography>
