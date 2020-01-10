@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../store/actions';
 import Video from './common/Video';
+
+// Temp hakish function to save temp camera window on screen
+function useStoredCameraClass() {
+  const [cameraClass, setCameraClass] = useState('');
+  useEffect(() => {
+    const storedClass = sessionStorage.getItem('temp-camera-class');
+    if (storedClass === null) {
+      return;
+    }
+
+    setCameraClass(storedClass);
+  }, []);
+  useEffect(() => {
+    sessionStorage.setItem('temp-camera-class', cameraClass);
+  }, [cameraClass]);
+
+  const toggleCameraClass = () => setCameraClass(cameraClass ? '' : 'hidden');
+
+  return [cameraClass, toggleCameraClass];
+}
 
 const HiddenCamera = ({ scanStart }) => {
   const faceCanvasRef = React.useRef();
@@ -17,13 +37,15 @@ const HiddenCamera = ({ scanStart }) => {
     });
   });
 
+  const [cameraClass, toggleCameraClass] = useStoredCameraClass();
+
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
-      className="video-container hidden"
+      className={`video-container ${cameraClass}`}
       onClick={evt => {
-        if (evt.detail === 4) {
-          document.getElementsByClassName('video-container')[0].classList.toggle('hidden');
+        if (evt.detail === 3) {
+          toggleCameraClass();
         }
       }}
     >
@@ -38,7 +60,4 @@ const mapDispatchToProps = {
   scanStart: actions.scanStart
 };
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(HiddenCamera);
+export default connect(null, mapDispatchToProps)(HiddenCamera);

@@ -12,8 +12,8 @@ import {
   take,
   takeLatest
 } from 'redux-saga/effects';
-import UIfx from 'uifx';
-import loginAudio from '../../../../assets/login.mp3';
+// import UIfx from 'uifx';
+// import loginAudio from '../../../../assets/login.mp3';
 import {
   HIBERNATE_TIMEOUT,
   PATH_CREATE_USER,
@@ -40,10 +40,10 @@ import {
   selectIsCreateUserPage
 } from '../selectors';
 
-const loginFx = new UIfx(loginAudio, {
-  volume: 0.3, // number between 0.0 ~ 1.0
-  throttleMs: 100
-});
+// const loginFx = new UIfx(loginAudio, {
+//   volume: 0.3, // number between 0.0 ~ 1.0
+//   throttleMs: 100
+// });
 
 const keydownChannel = eventChannel(emitter => {
   document.addEventListener('keydown', emitter);
