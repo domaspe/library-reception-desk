@@ -4,12 +4,23 @@ body {
 
 .video-container {
   position: absolute;
-  bottom: 0;
-  right: -256px;
-  transform-origin: bottom center;
-  transform: scale(-0.2, 0.2);
+  bottom: 16px;
   z-index: 99999;
   transition: all 300ms !important;
+  filter: sepia(1) hue-rotate(314deg) saturate(2) contrast(7);
+  border-radius: 100px;
+  overflow: hidden;
+  border: 4px solid #f73859;
+  right: 16px;
+  width: 100px;
+  height: 100px;
+}
+
+.video-container video,
+.video-container canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .video-container.hidden {
