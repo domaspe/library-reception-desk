@@ -42,7 +42,7 @@ const HiddenCamera = ({ scanStart }) => {
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
-      className={`video-container ${cameraClass}`}
+      className={`video-container mirror ${cameraClass}`}
       onClick={evt => {
         if (evt.detail === 3) {
           toggleCameraClass();
